@@ -1,0 +1,116 @@
+import requests
+import sqlite3
+import time
+
+# AniList GraphQL API URL
+API_URL = "https://graphql.anilist.co"
+
+# GraphQL Query Template
+QUERY = '''
+query ($page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo {
+      hasNextPage
+    }
+    media(type: ANIME) {
+      id
+      title {
+        romaji
+        english
+        native
+      }
+      description
+      episodes
+      genres
+      averageScore
+      coverImage {
+        large
+      }
+    }
+  }
+}
+'''
+
+# Function to fetch anime data with pagination
+def fetch_all_anime():
+    page = 1
+    per_page = 50  # AniList allows max 50 per request
+    has_next_page = True
+    all_anime = []
+
+    while has_next_page:
+        variables = {"page": page, "perPage": per_page}
+        response = requests.post(API_URL, json={"query": QUERY, "variables": variables})
+
+        if response.status_code == 200:
+            data = response.json()
+            anime_list = data["data"]["Page"]["media"]
+            has_next_page = data["data"]["Page"]["pageInfo"]["hasNextPage"]
+            
+            all_anime.extend(anime_list)
+            print(f"Fetched {len(anime_list)} animes from page {page}...")
+
+            page += 1
+            time.sleep(1)  # Avoid rate limits
+        else:
+            print(f"Error {response.status_code}: {response.text}")
+            break
+
+    print(f"Total anime fetched: {len(all_anime)}")
+    return all_anime
+
+# Function to create database and table
+def create_database():
+    conn = sqlite3.connect("anime.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS anime (
+            id INTEGER PRIMARY KEY,
+            romaji_title TEXT,
+            english_title TEXT,
+            native_title TEXT,
+            description TEXT,
+            episodes INTEGER,
+            genres TEXT,
+            average_score INTEGER,
+            cover_image TEXT
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+# Function to insert anime data into the database
+def insert_anime_data(anime_list):
+    conn = sqlite3.connect("anime.db")
+    cursor = conn.cursor()
+
+    for anime in anime_list:
+        cursor.execute('''
+            INSERT OR IGNORE INTO anime (id, romaji_title, english_title, native_title, description, episodes, genres, average_score, cover_image)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (
+            anime["id"],
+            anime["title"]["romaji"],
+            anime["title"]["english"],
+            anime["title"]["native"],
+            anime["description"],
+            anime["episodes"],
+            ", ".join(anime["genres"]) if anime["genres"] else None,
+            anime["averageScore"],
+            anime["coverImage"]["large"]
+        ))
+
+    conn.commit()
+    conn.close()
+
+# Main function to fetch and store all anime data
+def main():
+    create_database()
+    anime_list = fetch_all_anime()
+    
+    if anime_list:
+        insert_anime_data(anime_list)
+        print("All anime data has been saved successfully!")
+
+if __name__ == "__main__":
+    main()
