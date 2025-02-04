@@ -2,115 +2,168 @@ import requests
 import sqlite3
 import time
 import logging
-from requests.exceptions import RequestException, HTTPError
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# MyAnimeList API URL
-API_URL = "https://api.myanimelist.net/v2/anime"
+API_URL = "https://graphql.anilist.co"
+QUERY = '''
+query ($page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    pageInfo {
+      hasNextPage
+    }
+    media(type: ANIME) {
+      id
+      title {
+        romaji
+        english
+        native
+      }
+      description
+      episodes
+      duration
+      status
+      season
+      seasonYear
+      startDate {
+        year
+        month
+        day
+      }
+      endDate {
+        year
+        month
+        day
+      }
+      genres
+      averageScore
+      popularity
+      studios {
+        nodes {
+          name
+        }
+      }
+      characters {
+        edges {
+          node {
+            name {
+              full
+            }
+          }
+        }
+      }
+      coverImage {
+        large
+      }
+    }
+  }
+}
+'''
 
-# Your MyAnimeList API Key
-API_KEY = "your_mal_api_key"  # Replace with your actual API key
-
-# Function to fetch all anime data with pagination
 def fetch_all_anime():
     page = 1
-    limit = 50  # MyAnimeList allows max 50 per request
+    per_page = 50
+    has_next_page = True
     all_anime = []
-    headers = {"Authorization": f"Bearer {API_KEY}"}
 
-    while True:
-        params = {"limit": limit, "offset": (page - 1) * limit}
+    while has_next_page:
+        variables = {"page": page, "perPage": per_page}
         try:
-            response = requests.get(API_URL, headers=headers, params=params)
+            response = requests.post(API_URL, json={"query": QUERY, "variables": variables})
             response.raise_for_status()
             data = response.json()
-            anime_list = data.get("data", [])
-            all_anime.extend(anime_list)
+            anime_list = data["data"]["Page"]["media"]
+            has_next_page = data["data"]["Page"]["pageInfo"]["hasNextPage"]
 
+            all_anime.extend(anime_list)
             logging.info(f"Fetched {len(anime_list)} anime from page {page}...")
 
-            if len(anime_list) < limit:
-                break
             page += 1
-            time.sleep(1)  # Delay to avoid API rate limits
-        except HTTPError as http_err:
-            logging.error(f"HTTP error occurred: {http_err}")
-            if response.status_code == 429:
-                logging.warning("Rate limit exceeded. Retrying in 60 seconds...")
-                time.sleep(60)
-            else:
-                break
-        except RequestException as req_err:
-            logging.error(f"Request exception occurred: {req_err}")
+            time.sleep(1)
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Request failed: {e}")
             break
 
     logging.info(f"Total anime fetched: {len(all_anime)}")
     return all_anime
 
-# Function to create the database and table
 def create_database():
     with sqlite3.connect("anime.db") as conn:
         cursor = conn.cursor()
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS anime (
                 id INTEGER PRIMARY KEY,
-                title TEXT,
+                romaji_title TEXT,
+                english_title TEXT,
+                native_title TEXT,
                 description TEXT,
                 episodes INTEGER,
+                duration INTEGER,
                 status TEXT,
+                season TEXT,
+                season_year INTEGER,
                 start_date TEXT,
                 end_date TEXT,
                 genres TEXT,
-                score REAL,
+                average_score INTEGER,
                 popularity INTEGER,
                 studios TEXT,
+                characters TEXT,
                 cover_image TEXT
             )
         ''')
         conn.commit()
 
-# Function to insert or update anime data
 def insert_or_update_anime(anime_list):
     with sqlite3.connect("anime.db") as conn:
         cursor = conn.cursor()
-        anime_data = [
-            (
-                anime["node"]["id"],
-                anime["node"]["title"],
-                anime["node"].get("synopsis", ""),
-                anime["node"].get("num_episodes", 0),
-                anime["node"]["status"],
-                anime["node"].get("start_date", ""),
-                anime["node"].get("end_date", ""),
-                ", ".join([genre["name"] for genre in anime["node"].get("genres", [])]),
-                anime["node"].get("mean", 0),
-                anime["node"].get("popularity", 0),
-                ", ".join([studio["name"] for studio in anime["node"].get("studios", [])]),
-                anime["node"]["main_picture"]["large"]
-            )
-            for anime in anime_list
-        ]
-        cursor.executemany('''
-            INSERT INTO anime (id, title, description, episodes, status, start_date, end_date, genres, score, popularity, studios, cover_image)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT(id) DO UPDATE SET
-                title = excluded.title,
-                description = excluded.description,
-                episodes = excluded.episodes,
-                status = excluded.status,
-                start_date = excluded.start_date,
-                end_date = excluded.end_date,
-                genres = excluded.genres,
-                score = excluded.score,
-                popularity = excluded.popularity,
-                studios = excluded.studios,
-                cover_image = excluded.cover_image
-        ''', anime_data)
+        for anime in anime_list:
+            cursor.execute('''
+                INSERT INTO anime (id, romaji_title, english_title, native_title, description, episodes, duration, status, 
+                                  season, season_year, start_date, end_date, genres, average_score, popularity, studios, 
+                                  characters, cover_image)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    romaji_title = excluded.romaji_title,
+                    english_title = excluded.english_title,
+                    native_title = excluded.native_title,
+                    description = excluded.description,
+                    episodes = excluded.episodes,
+                    duration = excluded.duration,
+                    status = excluded.status,
+                    season = excluded.season,
+                    season_year = excluded.season_year,
+                    start_date = excluded.start_date,
+                    end_date = excluded.end_date,
+                    genres = excluded.genres,
+                    average_score = excluded.average_score,
+                    popularity = excluded.popularity,
+                    studios = excluded.studios,
+                    characters = excluded.characters,
+                    cover_image = excluded.cover_image
+            ''', (
+                anime["id"],
+                anime["title"]["romaji"],
+                anime["title"]["english"],
+                anime["title"]["native"],
+                anime["description"],
+                anime["episodes"],
+                anime["duration"],
+                anime["status"],
+                anime["season"],
+                anime["seasonYear"],
+                f'{anime["startDate"]["year"]}-{anime["startDate"]["month"]}-{anime["startDate"]["day"]}' if anime["startDate"]["year"] else None,
+                f'{anime["endDate"]["year"]}-{anime["endDate"]["month"]}-{anime["endDate"]["day"]}' if anime["endDate"]["year"] else None,
+                ", ".join(anime["genres"]) if anime["genres"] else None,
+                anime["averageScore"],
+                anime["popularity"],
+                ", ".join([studio["name"] for studio in anime["studios"]["nodes"]]) if anime["studios"]["nodes"] else None,
+                ", ".join([char["node"]["name"]["full"] for char in anime["characters"]["edges"]]) if anime["characters"]["edges"] else None,
+                anime["coverImage"]["large"]
+            ))
         conn.commit()
 
-# Function to continuously update the database at the minimum interval
 def update_loop(interval=300):  # Updates every 5 minutes
     while True:
         logging.info("Starting anime database update...")
@@ -123,7 +176,6 @@ def update_loop(interval=300):  # Updates every 5 minutes
         logging.info(f"Waiting {interval} seconds before the next update...")
         time.sleep(interval)
 
-# Main function
 if __name__ == "__main__":
     create_database()
     update_loop(interval=300)  # Updates every 5 minutes
