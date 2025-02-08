@@ -33,7 +33,7 @@ async function fetchOngoingAnime(page = 1) {
   const query = `
     query {
       Page(page: ${page}, perPage: 50) {
-        media(type: ANIME, status: RELEASING, sort: POPULARITY_DESC) {
+        media(type: ANIME, status: RELEASING, sort: POPULARITY_DESC, genre_not_in: ["Hentai"]) {
           id
           title {
             romaji
@@ -61,13 +61,13 @@ async function fetchOngoingAnime(page = 1) {
   });
 
   const data = await response.json();
-  displayAnime(data.data.Page.media, 'ongoing-anime-carousel');
+  displayAnime(data.data.Page.media, 'ongoing-anime-grid');
   updatePagination(data.data.Page.pageInfo);
 }
 
-function displayAnime(animes, carouselId) {
-  const animeCarousel = document.getElementById(carouselId);
-  animeCarousel.innerHTML = ''; // Clear previous results
+function displayAnime(animes, gridId) {
+  const animeGrid = document.getElementById(gridId);
+  animeGrid.innerHTML = ''; // Clear previous results
 
   animes.forEach(anime => {
     const animeCard = document.createElement('div');
@@ -83,7 +83,7 @@ function displayAnime(animes, carouselId) {
 
     animeCard.appendChild(animeImage);
     animeCard.appendChild(animeTitle);
-    animeCarousel.appendChild(animeCard);
+    animeGrid.appendChild(animeCard);
   });
 }
 
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('anime-carousel')) {
     fetchAnime();
   }
-  if (document.getElementById('ongoing-anime-carousel')) {
+  if (document.getElementById('ongoing-anime-grid')) {
     fetchOngoingAnime();
   }
 
