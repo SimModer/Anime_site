@@ -29,10 +29,10 @@ async function fetchAnime() {
   displayAnime(data.data.Page.media, 'anime-carousel');
 }
 
-async function fetchOngoingAnime() {
+async function fetchOngoingAnime(page = 1) {
   const query = `
     query {
-      Page(page: 1, perPage: 50) { // Fetch more animes for the ongoing page
+      Page(page: ${page}, perPage: 50) {
         media(type: ANIME, status: RELEASING, sort: POPULARITY_DESC) {
           id
           title {
@@ -42,6 +42,10 @@ async function fetchOngoingAnime() {
           coverImage {
             large
           }
+        }
+        pageInfo {
+          currentPage
+          lastPage
         }
       }
     }
@@ -58,6 +62,7 @@ async function fetchOngoingAnime() {
 
   const data = await response.json();
   displayAnime(data.data.Page.media, 'ongoing-anime-carousel');
+  updatePagination(data.data.Page.pageInfo);
 }
 
 function displayAnime(animes, carouselId) {
@@ -82,6 +87,26 @@ function displayAnime(animes, carouselId) {
   });
 }
 
+function updatePagination(pageInfo) {
+  const prevButton = document.getElementById('prev-page');
+  const nextButton = document.getElementById('next-page');
+  const pageInfoSpan = document.getElementById('page-info');
+
+  if (pageInfo.currentPage === 1) {
+    prevButton.disabled = true;
+  } else {
+    prevButton.disabled = false;
+  }
+
+  if (pageInfo.currentPage === pageInfo.lastPage) {
+    nextButton.disabled = true;
+  } else {
+    nextButton.disabled = false;
+  }
+
+  pageInfoSpan.textContent = `Page ${pageInfo.currentPage}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('anime-carousel')) {
     fetchAnime();
@@ -89,4 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('ongoing-anime-carousel')) {
     fetchOngoingAnime();
   }
+
+  document.getElementById('prev-page').addEventListener('click', () => {
+    const currentPage = parseInt(document.getElementById('page-info').textContent.split(' ')[1]);
+    fetchOngoingAnime(currentPage - 1);
+  });
+
+  document.getElementById('next-page').addEventListener('click', () => {
+    const currentPage = parseInt(document.getElementById('page-info').textContent.split(' ')[1]);
+    fetchOngoingAnime(currentPage + 1);
+  });
 });
