@@ -7,7 +7,11 @@ URL = 'https://transphoto.org/list.php?cid=149&t=1'
 
 # Function to get the HTML content of the page
 def get_html(url):
-    response = requests.get(url)
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Referer': 'https://transphoto.org/'
+    }
+    response = requests.get(url, headers=headers)
     response.raise_for_status()  # Raise an error for bad status codes
     return response.text
 
