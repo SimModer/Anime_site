@@ -94,6 +94,68 @@ main {
   margin-bottom: 5px;
 }
 
+/* --- Make days (ორშაბათი-კვირა) in one row --- */
+#schedule-days-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 3px;
+  padding: 0 24px 10px 24px;
+}
+
+/* Tabs for weekdays */
+#schedule-days-row .day-label-row {
+  font-size: 1.07rem;
+  font-weight: bold;
+  padding: 8px 0;
+  flex: 1 1 0;
+  text-align: center;
+  border-radius: 4px 4px 0 0;
+  background: #f8f8f8;
+  border: 1px solid #eee;
+  border-bottom: none;
+  transition: background 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+}
+
+#schedule-days-row .day-label-row.today {
+  background: var(--color-day-today);
+  color: var(--color-main);
+  border-color: var(--color-main);
+  z-index: 2;
+}
+
+/* Arrow styling directly in tab */
+#schedule-days-row .arrow {
+  font-size: 1.2rem;
+  color: var(--color-toggle-link);
+  display: inline-block;
+  min-width: 18px;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+#schedule-days-row .day-label-row.today .arrow {
+  color: var(--color-main);
+}
+
+#schedule-days-row .arrow::after {
+  content: "▶";
+}
+
+#schedule-days-row .day-label-row.today .arrow::after {
+  content: "▼";
+}
+
+/* Hide the original day labels in details summary */
+#schedule details .day-label {
+  display: none;
+}
+
 #schedule details {
   border-bottom: 1px solid #ccc;
   margin-bottom: 0;
@@ -118,37 +180,6 @@ main {
   outline: none;
   user-select: none;
   transition: background 0.2s;
-}
-
-.day-label {
-  flex-grow: 1;
-}
-
-.toggle-link {
-  color: var(--color-toggle-link);
-  font-size: 1rem;
-  font-weight: normal;
-  padding-left: 10px;
-  cursor: pointer;
-  border-bottom: none;
-  display: flex;
-  align-items: center;
-  gap: 3px;
-}
-
-/* Only arrows, no text */
-.toggle-link::after {
-  content: "▶";
-  font-size: 1.1rem;
-  color: var(--color-toggle-link);
-  transition: transform 0.2s;
-  margin-left: 2px;
-}
-
-#schedule details[open] .toggle-link::after {
-  content: "▼";
-  color: var(--color-main);
-  transition: transform 0.2s;
 }
 
 .anime-list {
@@ -218,6 +249,11 @@ main {
   .panel-title, .panel-warning {
     padding-left: 8px;
     padding-right: 8px;
+  }
+  #schedule-days-row {
+    padding-left: 8px;
+    padding-right: 8px;
+    gap: 2px;
   }
   #schedule summary, .anime-list {
     padding-left: 8px;

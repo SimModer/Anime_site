@@ -14,6 +14,28 @@ window.addEventListener("DOMContentLoaded", () => {
   const todayJS = new Date().getDay(); // 0=Sunday
   const todayIndex = DAY_REMAP[todayJS];
 
+  // Highlight today in row
+  const dayRowItems = document.querySelectorAll("#schedule-days-row .day-label-row");
+  if (dayRowItems[todayIndex]) {
+    dayRowItems[todayIndex].classList.add("today");
+  }
+
+  // When clicking a day in the row, open/collapse the corresponding details
+  dayRowItems.forEach((item, i) => {
+    item.addEventListener("click", () => {
+      const detailsList = document.querySelectorAll("#schedule details");
+      detailsList.forEach((details, j) => {
+        if (j === i) {
+          details.setAttribute("open", "true");
+          details.querySelector("summary").classList.add("today");
+        } else {
+          details.removeAttribute("open");
+          details.querySelector("summary").classList.remove("today");
+        }
+      });
+    });
+  });
+
   // Auto-open today's dropdown WITHOUT "(დღეს)"
   const detailsList = document.querySelectorAll("#schedule details");
   if (detailsList[todayIndex]) {
