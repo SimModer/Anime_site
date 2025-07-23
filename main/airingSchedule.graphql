@@ -1,0 +1,18 @@
+query ($page: Int, $perPage: Int) {
+  Page(page: $page, perPage: $perPage) {
+    airingSchedules(notYetAired: true, sort: TIME, airingAt_greater: 0) {
+      media {
+        title {
+          romaji
+        }
+        coverImage {
+          medium
+        }
+        nextAiringEpisode {
+          airingAt
+          episode
+        }
+      }
+    }
+  }
+}
