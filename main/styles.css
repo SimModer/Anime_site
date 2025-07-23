@@ -1,134 +1,141 @@
+:root {
+  --color-main: #8B0000;
+  --color-header-bg: #e5e5e5;
+  --color-day-today: #f9f0f0;
+  --color-anime-hover: #f9f9f9;
+}
+
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  
-  header {
-    background-color: #8B0000; /* dark red */
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 20px;
-  }
-  
-  .logo {
-    font-size: 1.5rem;
-    font-weight: bold;
-  }
-  
-  .search-box {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-  }
-  
-  .search-box input {
-    width: 300px;
-    padding: 5px 10px;
-    border: none;
-    border-radius: 4px;
-  }
-  
-  .auth-buttons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .auth-buttons button {
-    padding: 6px 12px;
-    background-color: white;
-    color: #8B0000;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  .auth-buttons button:hover {
-    background-color: #f0f0f0;
-  }
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background-color: var(--color-main);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.search-box input {
+  width: 300px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.auth-buttons button {
+  padding: 6px 12px;
+  background-color: white;
+  color: var(--color-main);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.auth-buttons button:hover, .auth-buttons button:focus {
+  background-color: #f0f0f0;
+  outline: 2px solid var(--color-main);
+}
 
 main {
-    padding: 20px;
+  padding: 20px;
+}
+
+.day-section {
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 8px;
+}
+
+.day-header {
+  background-color: var(--color-header-bg);
+  padding: 12px 16px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.day-header.today {
+  background-color: var(--color-day-today);
+}
+
+.anime-list {
+  background-color: #fff;
+  padding: 10px 16px;
+}
+
+.anime-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.anime-item:hover, .anime-item:focus {
+  background-color: var(--color-anime-hover);
+  outline: 1px solid var(--color-main);
+}
+
+.anime-item img {
+  width: 50px;
+  height: 70px;
+  object-fit: cover;
+  margin-right: 12px;
+  border-radius: 4px;
+}
+
+.anime-details {
+  flex: 1;
+}
+
+.anime-title {
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.anime-meta {
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 4px;
+  text-align: right;
+}
+
+#loading, #error {
+  margin: 20px 0;
+  color: var(--color-main);
+  font-weight: bold;
+}
+
+@media (max-width: 600px) {
+  .search-box input {
+    width: 100px;
   }
-    
-  .day-section {
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .day-header {
-    background-color: #e5e5e5;
-    padding: 12px 16px;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-  }
-  
-  .day-header.today {
-    background-color: #f9f0f0;
-  }
-  
-  .toggle-button {
-    background: none;
-    border: none;
-    color: #d22;
-    cursor: pointer;
-    font-size: 0.9rem;
-    text-decoration: underline;
-  }
-  
-  .anime-list {
-    background-color: #fff;
-    padding: 10px 16px;
-  }
-  
-  .anime-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 12px;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 10px;
-    transition: background-color 0.2s ease;
-  }
-  .anime-item:hover {
-    background-color: #f9f9f9;
-  }
-  
   .anime-item img {
-    width: 50px;
-    height: 70px;
-    object-fit: cover;
-    margin-right: 12px;
-    border-radius: 4px;
+    width: 40px;
+    height: 56px;
   }
-  
-  .anime-details {
-    flex: 1;
-  }
-  
-  .anime-title {
-    font-size: 0.95rem;
-    font-weight: bold;
-  }
-  
-  .anime-meta {
-    font-size: 0.85rem;
-    color: #666;
-    margin-top: 4px;
-    text-align: right;
-  }
-  
-  *, *::before, *::after {
-    box-sizing: border-box;
-  }
-  
-  .toggle-button {
-    transition: transform 0.3s ease;
-  }
-  .toggle-button.rotated {
-    transform: rotate(180deg);
-  }
-  
+}
