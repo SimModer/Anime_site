@@ -6,6 +6,7 @@
   --color-warning-bg: #fff8f3;
   --color-warning-border: #d27c7c;
   --color-toggle-link: #d27c7c;
+  --color-toggle-active: #8B0000;
 }
 
 body {
@@ -94,99 +95,74 @@ main {
   margin-bottom: 5px;
 }
 
-/* --- Make days (ორშაბათი-კვირა) in one row --- */
-#schedule-days-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 3px;
-  padding: 0 24px 10px 24px;
-}
-
-/* Tabs for weekdays */
-#schedule-days-row .day-label-row {
-  font-size: 1.07rem;
-  font-weight: bold;
-  padding: 8px 0;
-  flex: 1 1 0;
-  text-align: center;
-  border-radius: 4px 4px 0 0;
-  background: #f8f8f8;
-  border: 1px solid #eee;
-  border-bottom: none;
-  transition: background 0.2s;
-  cursor: pointer;
+/* Weekday rows */
+.weekday-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  position: relative;
+  justify-content: space-between;
+  font-size: 1.15rem;
+  font-weight: bold;
+  background: #f7f7f7;
+  border-bottom: 1px solid #ccc;
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 
-#schedule-days-row .day-label-row.today {
+.weekday-row.today {
   background: var(--color-day-today);
   color: var(--color-main);
-  border-color: var(--color-main);
-  z-index: 2;
+  border-bottom: 2px solid var(--color-main);
 }
 
-/* Arrow styling directly in tab */
-#schedule-days-row .arrow {
-  font-size: 1.2rem;
+.weekday-label {
+  flex-grow: 1;
+}
+
+.toggle-arrow {
   color: var(--color-toggle-link);
-  display: inline-block;
-  min-width: 18px;
-  text-align: center;
-  transition: color 0.2s;
-}
-
-#schedule-days-row .day-label-row.today .arrow {
-  color: var(--color-main);
-}
-
-#schedule-days-row .arrow::after {
-  content: "▶";
-}
-
-#schedule-days-row .day-label-row.today .arrow::after {
-  content: "▼";
-}
-
-/* Hide the original day labels in details summary */
-#schedule details .day-label {
-  display: none;
-}
-
-#schedule details {
-  border-bottom: 1px solid #ccc;
-  margin-bottom: 0;
-  background: #f9f9f9;
-  transition: background 0.2s;
-}
-
-#schedule details[open] {
-  background: #fff;
-}
-
-#schedule summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 13px 24px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 1.15rem;
-  background: transparent;
-  border: none;
-  outline: none;
+  font-size: 1.1rem;
+  font-weight: normal;
+  padding-left: 10px;
+  min-width: 50px;
+  text-align: right;
   user-select: none;
-  transition: background 0.2s;
+}
+
+.weekday-row[aria-expanded="true"] .toggle-arrow {
+  color: var(--color-toggle-active);
+  font-weight: bold;
+}
+
+.toggle-arrow::before {
+  content: "▶";
+  font-size: 1.1rem;
+  margin-right: 5px;
+}
+
+.weekday-row[aria-expanded="true"] .toggle-arrow::before {
+  content: "▼";
+  color: var(--color-toggle-active);
+  font-size: 1.1rem;
+  margin-right: 5px;
+}
+
+/* Anime list container */
+.anime-list-container {
+  display: none;
+  background: #fff;
+  box-shadow: 0 2px 6px #eee;
+  padding: 10px 0;
+}
+
+.anime-list-container.active {
+  display: block;
 }
 
 .anime-list {
   max-height: 300px;
   overflow-y: auto;
-  background-color: #fff;
-  padding: 10px 24px;
+  padding: 0 18px;
 }
 
 .anime-item {
@@ -210,8 +186,8 @@ main {
 }
 
 .anime-item img {
-  width: 50px;
-  height: 70px;
+  width: 48px;
+  height: 66px;
   object-fit: cover;
   margin-right: 12px;
   border-radius: 4px;
@@ -222,21 +198,15 @@ main {
 }
 
 .anime-title {
-  font-size: 0.99rem;
+  font-size: 1rem;
   font-weight: bold;
 }
 
 .anime-meta {
-  font-size: 0.92rem;
+  font-size: 0.94rem;
   color: #666;
   margin-top: 4px;
   text-align: right;
-}
-
-#loading, #error {
-  margin: 20px 0;
-  color: var(--color-main);
-  font-weight: bold;
 }
 
 @media (max-width: 600px) {
@@ -250,12 +220,11 @@ main {
     padding-left: 8px;
     padding-right: 8px;
   }
-  #schedule-days-row {
+  .weekday-row {
     padding-left: 8px;
     padding-right: 8px;
-    gap: 2px;
   }
-  #schedule summary, .anime-list {
+  .anime-list {
     padding-left: 8px;
     padding-right: 8px;
   }
@@ -263,8 +232,8 @@ main {
     width: 100px;
   }
   .anime-item img {
-    width: 40px;
-    height: 56px;
+    width: 36px;
+    height: 50px;
   }
   .auth-buttons {
     right: 10px;

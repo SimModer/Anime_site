@@ -1,51 +1,41 @@
-// Remapping JS days (Sun=0) to Georgian week order (Mon=0)
 const DAY_REMAP = [6, 0, 1, 2, 3, 4, 5];
-
 const daysGeorgian = [
   "ორშაბათი", "სამშაბათი", "ოთხშაბათი",
   "ხუთშაბათი", "პარასკევი", "შაბათი", "კვირა"
 ];
-
 const monthsGeorgian = [
   "იან", "თებ", "მარ", "აპრ", "მაი", "ივნ", "ივლ", "აგვ", "სექ", "ოქტ", "ნოე", "დეკ"
 ];
 
 window.addEventListener("DOMContentLoaded", () => {
-  const todayJS = new Date().getDay(); // 0=Sunday
+  const todayJS = new Date().getDay();
   const todayIndex = DAY_REMAP[todayJS];
 
-  // Highlight today in row
-  const dayRowItems = document.querySelectorAll("#schedule-days-row .day-label-row");
-  if (dayRowItems[todayIndex]) {
-    dayRowItems[todayIndex].classList.add("today");
-  }
+  // Remove highlight and "(დღეს)" text for today
+  // (You can add .today class if you want visual highlight, or skip entirely)
 
-  // When clicking a day in the row, open/collapse the corresponding details
-  dayRowItems.forEach((item, i) => {
-    item.addEventListener("click", () => {
-      const detailsList = document.querySelectorAll("#schedule details");
-      detailsList.forEach((details, j) => {
-        if (j === i) {
-          details.setAttribute("open", "true");
-          details.querySelector("summary").classList.add("today");
+  // Toggle expand/collapse on row click
+  const weekdayRows = document.querySelectorAll('.weekday-row');
+  weekdayRows.forEach((row, idx) => {
+    row.addEventListener('click', () => {
+      const listContainers = document.querySelectorAll('.anime-list-container');
+      weekdayRows.forEach((r, i) => {
+        if (i === idx) {
+          r.setAttribute('aria-expanded', 'true');
+          listContainers[i].classList.add('active');
         } else {
-          details.removeAttribute("open");
-          details.querySelector("summary").classList.remove("today");
+          r.setAttribute('aria-expanded', 'false');
+          listContainers[i].classList.remove('active');
         }
       });
     });
   });
 
-  // Auto-open today's dropdown WITHOUT "(დღეს)"
-  const detailsList = document.querySelectorAll("#schedule details");
-  if (detailsList[todayIndex]) {
-    detailsList[todayIndex].setAttribute("open", "true");
-    detailsList[todayIndex].querySelector("summary").classList.add("today");
-    // Remove "(დღეს)" from summary text if present
-    let summary = detailsList[todayIndex].querySelector("summary");
-    if (summary.textContent.includes("(დღეს)")) {
-      summary.textContent = summary.textContent.replace(/\s*\(დღეს\)/, "");
-    }
+  // Open today's by default, but do not add "(დღეს)" or any highlight
+  const listContainers = document.querySelectorAll('.anime-list-container');
+  if (listContainers[todayIndex]) {
+    weekdayRows[todayIndex].setAttribute('aria-expanded', 'true');
+    listContainers[todayIndex].classList.add('active');
   }
 
   // Fetch and populate anime schedule
