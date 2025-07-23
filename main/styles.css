@@ -62,22 +62,20 @@ main {
   padding: 20px;
 }
 
-.day-section {
+#schedule details {
   border-bottom: 1px solid #ccc;
   margin-bottom: 8px;
 }
 
-.day-header {
+#schedule summary {
   background-color: var(--color-header-bg);
   padding: 12px 16px;
   font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: block;
   cursor: pointer;
 }
 
-.day-header.today {
+#schedule summary.today {
   background-color: var(--color-day-today);
 }
 

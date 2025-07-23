@@ -14,64 +14,17 @@ window.addEventListener("DOMContentLoaded", () => {
   const todayJS = new Date().getDay(); // 0=Sunday
   const todayIndex = DAY_REMAP[todayJS];
 
-  // Auto-open today's dropdown (assuming <details> elements with ids like day-0, day-1, ...)
-  const todayDetail = document.getElementById(`day-${todayIndex}`);
-  if (todayDetail) {
-    todayDetail.setAttribute("open", "true");
+  // Auto-open today's dropdown
+  const detailsList = document.querySelectorAll("#schedule details");
+  if (detailsList[todayIndex]) {
+    detailsList[todayIndex].setAttribute("open", "true");
+    detailsList[todayIndex].querySelector("summary").classList.add("today");
+    detailsList[todayIndex].querySelector("summary").textContent += " (დღეს)";
   }
-
-  // Mark today's section and setup click toggles
-  document.querySelectorAll(".day-section").forEach((section, index) => {
-    const header = section.querySelector(".day-header");
-    const dayNameElem = header.querySelector(".day-name");
-
-    // Add Georgian day name if needed
-    if (dayNameElem && daysGeorgian[index]) {
-      dayNameElem.textContent = daysGeorgian[index];
-    }
-
-    // Highlight today and expand list
-    if (index === todayIndex) {
-      header.classList.add("today");
-      if (dayNameElem) dayNameElem.textContent += " (დღეს)";
-      toggleAnimeList(section, true);
-    }
-
-    // Toggle anime list on header click
-    header.addEventListener("click", () => {
-      const list = section.querySelector(".anime-list");
-      const isOpen = list && list.style.display === "block";
-      toggleAnimeList(section, !isOpen);
-    });
-  });
 
   // Fetch and populate anime schedule
   fetchAnimeSchedule();
 });
-
-/**
- * Toggles the anime list visibility for a given section,
- * and ensures all other sections are closed.
- * @param {Element} section - The day-section element to toggle.
- * @param {boolean} open - Whether to open (true) or close (false) the section.
- */
-function toggleAnimeList(section, open) {
-  const allSections = document.querySelectorAll(".day-section");
-
-  allSections.forEach(s => {
-    const list = s.querySelector(".anime-list");
-    const btn = s.querySelector(".toggle-button");
-    if (list) list.style.display = "none";
-    if (btn) btn.textContent = "Развернуть";
-  });
-
-  if (open) {
-    const list = section.querySelector(".anime-list");
-    const btn = section.querySelector(".toggle-button");
-    if (list) list.style.display = "block";
-    if (btn) btn.textContent = "Свернуть";
-  }
-}
 
 /**
  * Fetches the upcoming anime airing schedule from AniList GraphQL API,
@@ -119,7 +72,8 @@ function fetchAnimeSchedule() {
         const dayJS = airingDate.getDay();
         const dayIndex = DAY_REMAP[dayJS];
 
-        const section = document.querySelector(`.day-section[data-day="${dayIndex}"]`);
+        const detailsList = document.querySelectorAll("#schedule details");
+        const section = detailsList[dayIndex];
         if (!section) return;
 
         const list = section.querySelector(".anime-list");
