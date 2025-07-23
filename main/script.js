@@ -1,8 +1,11 @@
+// Remapping JS days (Sun=0) to Georgian week order (Mon=0)
 const DAY_REMAP = [6, 0, 1, 2, 3, 4, 5];
+
 const daysGeorgian = [
   "ორშაბათი", "სამშაბათი", "ოთხშაბათი",
   "ხუთშაბათი", "პარასკევი", "შაბათი", "კვირა"
 ];
+
 const monthsGeorgian = [
   "იან", "თებ", "მარ", "აპრ", "მაი", "ივნ", "ივლ", "აგვ", "სექ", "ოქტ", "ნოე", "დეკ"
 ];
@@ -11,25 +14,30 @@ window.addEventListener("DOMContentLoaded", () => {
   const todayJS = new Date().getDay(); // 0=Sunday
   const todayIndex = DAY_REMAP[todayJS];
 
+  // Auto-open today's dropdown (assuming <details> elements with ids like day-0, day-1, ...)
   const todayDetail = document.getElementById(`day-${todayIndex}`);
   if (todayDetail) {
     todayDetail.setAttribute("open", "true");
   }
 
+  // Mark today's section and setup click toggles
   document.querySelectorAll(".day-section").forEach((section, index) => {
     const header = section.querySelector(".day-header");
     const dayNameElem = header.querySelector(".day-name");
 
+    // Add Georgian day name if needed
     if (dayNameElem && daysGeorgian[index]) {
       dayNameElem.textContent = daysGeorgian[index];
     }
 
+    // Highlight today and expand list
     if (index === todayIndex) {
       header.classList.add("today");
       if (dayNameElem) dayNameElem.textContent += " (დღეს)";
       toggleAnimeList(section, true);
     }
 
+    // Toggle anime list on header click
     header.addEventListener("click", () => {
       const list = section.querySelector(".anime-list");
       const isOpen = list && list.style.display === "block";
@@ -37,9 +45,16 @@ window.addEventListener("DOMContentLoaded", () => {
     });
   });
 
+  // Fetch and populate anime schedule
   fetchAnimeSchedule();
 });
 
+/**
+ * Toggles the anime list visibility for a given section,
+ * and ensures all other sections are closed.
+ * @param {Element} section - The day-section element to toggle.
+ * @param {boolean} open - Whether to open (true) or close (false) the section.
+ */
 function toggleAnimeList(section, open) {
   const allSections = document.querySelectorAll(".day-section");
 
@@ -58,6 +73,10 @@ function toggleAnimeList(section, open) {
   }
 }
 
+/**
+ * Fetches the upcoming anime airing schedule from AniList GraphQL API,
+ * then inserts anime items into the correct day sections.
+ */
 function fetchAnimeSchedule() {
   const query = `
     query {
@@ -135,9 +154,15 @@ function fetchAnimeSchedule() {
     })
     .catch(error => {
       console.error("Failed to fetch anime schedule:", error);
+      // Optionally: Show a user-friendly message here
     });
 }
 
+/**
+ * Basic HTML escaping to prevent injection in inserted content
+ * @param {string} unsafe - Unsafe string possibly containing HTML special chars.
+ * @returns {string} Escaped string safe for insertion into HTML.
+ */
 function escapeHTML(unsafe) {
   return unsafe.replace(/[&<>"']/g, function(m) {
     switch (m) {
