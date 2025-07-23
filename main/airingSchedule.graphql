@@ -1,17 +1,15 @@
 query ($page: Int, $perPage: Int) {
   Page(page: $page, perPage: $perPage) {
-    airingSchedules(notYetAired: true, sort: TIME, airingAt_greater: 0) {
-      media {
-        title {
-          romaji
-        }
-        coverImage {
-          medium
-        }
-        nextAiringEpisode {
-          airingAt
-          episode
-        }
+    media(type: ANIME, sort: POPULARITY_DESC, status_in: [RELEASING, NOT_YET_RELEASED]) {
+      title {
+        romaji
+      }
+      coverImage {
+        medium
+      }
+      nextAiringEpisode {
+        airingAt
+        episode
       }
     }
   }

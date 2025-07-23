@@ -32,7 +32,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 /**
  * Fetches the upcoming anime airing schedule from AniList GraphQL API,
- * then inserts anime items into the correct day sections.
+ * then inserts only the next episode per anime into the correct day sections.
  */
 function fetchAnimeSchedule() {
   const query = `
@@ -42,6 +42,7 @@ function fetchAnimeSchedule() {
           airingAt
           episode
           media {
+            id
             title {
               romaji
             }
@@ -71,7 +72,22 @@ function fetchAnimeSchedule() {
 
       const schedules = data.data.Page.airingSchedules;
 
-      schedules.forEach(item => {
+      // Map to store only the next episode per anime (by anime id)
+      const nextEpisodes = new Map();
+      for (const item of schedules) {
+        const animeId = item.media?.id;
+        if (!animeId) continue;
+        // If anime not yet added, or this episode is earlier, add/update
+        if (
+          !nextEpisodes.has(animeId) ||
+          item.airingAt < nextEpisodes.get(animeId).airingAt
+        ) {
+          nextEpisodes.set(animeId, item);
+        }
+      }
+
+      // Now insert each next episode into the correct day
+      nextEpisodes.forEach(item => {
         const airingDate = new Date(item.airingAt * 1000);
         const dayJS = airingDate.getDay();
         const dayIndex = DAY_REMAP[dayJS];
