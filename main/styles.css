@@ -128,32 +128,27 @@ main {
   color: var(--color-toggle-link);
   font-size: 1rem;
   font-weight: normal;
-  border-bottom: 1px dashed var(--color-toggle-link);
   padding-left: 10px;
   cursor: pointer;
+  border-bottom: none;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
 
-#schedule details[open] .toggle-link {
-  color: var(--color-main);
-  border-bottom: 1px dashed var(--color-main);
-}
-#schedule details[open] .toggle-link::after {
-  content: "ჩაკეცა";
-  color: var(--color-main);
-  border-bottom: 1px dashed var(--color-main);
-  margin-left: -5px;
-  margin-right: 0;
-  font-size: 1rem;
-  font-weight: normal;
-}
-#schedule details:not([open]) .toggle-link::after {
-  content: "გაშლა";
+/* Arrow icons for details toggle (rotates for open/close) */
+.toggle-link::after {
+  content: "▶";
+  font-size: 1.1rem;
   color: var(--color-toggle-link);
-  border-bottom: 1px dashed var(--color-toggle-link);
-  margin-left: -5px;
-  margin-right: 0;
-  font-size: 1rem;
-  font-weight: normal;
+  transition: transform 0.2s;
+  margin-left: 2px;
+}
+
+#schedule details[open] .toggle-link::after {
+  content: "▼";
+  color: var(--color-main);
+  transition: transform 0.2s;
 }
 
 .anime-list {

@@ -14,12 +14,16 @@ window.addEventListener("DOMContentLoaded", () => {
   const todayJS = new Date().getDay(); // 0=Sunday
   const todayIndex = DAY_REMAP[todayJS];
 
-  // Auto-open today's dropdown
+  // Auto-open today's dropdown WITHOUT "(დღეს)"
   const detailsList = document.querySelectorAll("#schedule details");
   if (detailsList[todayIndex]) {
     detailsList[todayIndex].setAttribute("open", "true");
     detailsList[todayIndex].querySelector("summary").classList.add("today");
-    detailsList[todayIndex].querySelector("summary").textContent += " (დღეს)";
+    // Remove "(დღეს)" from summary text if present
+    let summary = detailsList[todayIndex].querySelector("summary");
+    if (summary.textContent.includes("(დღეს)")) {
+      summary.textContent = summary.textContent.replace(/\s*\(დღეს\)/, "");
+    }
   }
 
   // Fetch and populate anime schedule
