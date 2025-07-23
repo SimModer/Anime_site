@@ -235,9 +235,3 @@ main {
     top: 10px;
   }
 }
-
-.checkbox-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
