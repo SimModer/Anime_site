@@ -1,41 +1,29 @@
+// Remapping JS days (Sun=0) to Georgian week order (Mon=0)
 const DAY_REMAP = [6, 0, 1, 2, 3, 4, 5];
+
 const daysGeorgian = [
   "ორშაბათი", "სამშაბათი", "ოთხშაბათი",
   "ხუთშაბათი", "პარასკევი", "შაბათი", "კვირა"
 ];
+
 const monthsGeorgian = [
   "იან", "თებ", "მარ", "აპრ", "მაი", "ივნ", "ივლ", "აგვ", "სექ", "ოქტ", "ნოე", "დეკ"
 ];
 
 window.addEventListener("DOMContentLoaded", () => {
-  const todayJS = new Date().getDay();
+  const todayJS = new Date().getDay(); // 0=Sunday
   const todayIndex = DAY_REMAP[todayJS];
 
-  // Remove highlight and "(დღეს)" text for today
-  // (You can add .today class if you want visual highlight, or skip entirely)
-
-  // Toggle expand/collapse on row click
-  const weekdayRows = document.querySelectorAll('.weekday-row');
-  weekdayRows.forEach((row, idx) => {
-    row.addEventListener('click', () => {
-      const listContainers = document.querySelectorAll('.anime-list-container');
-      weekdayRows.forEach((r, i) => {
-        if (i === idx) {
-          r.setAttribute('aria-expanded', 'true');
-          listContainers[i].classList.add('active');
-        } else {
-          r.setAttribute('aria-expanded', 'false');
-          listContainers[i].classList.remove('active');
-        }
-      });
-    });
-  });
-
-  // Open today's by default, but do not add "(დღეს)" or any highlight
-  const listContainers = document.querySelectorAll('.anime-list-container');
-  if (listContainers[todayIndex]) {
-    weekdayRows[todayIndex].setAttribute('aria-expanded', 'true');
-    listContainers[todayIndex].classList.add('active');
+  // Auto-open today's dropdown WITHOUT "(დღეს)"
+  const detailsList = document.querySelectorAll("#schedule details");
+  if (detailsList[todayIndex]) {
+    detailsList[todayIndex].setAttribute("open", "true");
+    detailsList[todayIndex].querySelector("summary").classList.add("today");
+    // Remove "(დღეს)" from summary text if present
+    let summary = detailsList[todayIndex].querySelector("summary");
+    if (summary.textContent.includes("(დღეს)")) {
+      summary.textContent = summary.textContent.replace(/\s*\(დღეს\)/, "");
+    }
   }
 
   // Fetch and populate anime schedule
