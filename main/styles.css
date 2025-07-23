@@ -136,7 +136,7 @@ main {
   gap: 3px;
 }
 
-/* Arrow icons for details toggle (rotates for open/close) */
+/* Only arrows, no text */
 .toggle-link::after {
   content: "▶";
   font-size: 1.1rem;
