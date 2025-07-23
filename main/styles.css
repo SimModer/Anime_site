@@ -24,6 +24,7 @@ header {
   font-weight: bold;
 }
 
+/* Nav is now only for search box. Auth-buttons moved out */
 nav {
   flex: 1;
   display: flex;
@@ -38,9 +39,13 @@ nav {
   border-radius: 4px;
 }
 
+/* Place auth-buttons in top right corner */
 .auth-buttons {
   display: flex;
   gap: 10px;
+  position: absolute;
+  top: 10px;
+  right: 20px;
 }
 
 .auth-buttons button {
@@ -135,5 +140,9 @@ main {
   .anime-item img {
     width: 40px;
     height: 56px;
+  }
+  .auth-buttons {
+    right: 10px;
+    top: 10px;
   }
 }
