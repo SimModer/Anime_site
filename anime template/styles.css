@@ -1,35 +1,43 @@
-body {
+/* Global Reset */
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
   font-family: Arial, sans-serif;
-  background-color: white;
+  background-color: #f8f9fa;
   color: #333;
+  line-height: 1.5;
 }
 
 .container {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.anime-info {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  background-color: #fff;
+  max-width: 1200px;
+  margin: auto;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+  gap: 20px;
 }
 
-@media (min-width: 768px) {
-  .anime-info {
-    flex-direction: row;
-  }
+/* ───── Sidebar ───── */
+.anime-sidebar {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.anime-info-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
 .anime-image {
-  width: 100%;
-  max-width: 300px;
+  flex: 0 0 150px;
+  max-width: 150px;
 }
 
 .anime-image img {
@@ -37,100 +45,124 @@ body {
   border-radius: 12px;
 }
 
-.anime-details {
-  flex: 1;
-}
-
-.anime-title {
-  font-size: 28px;
-  margin-bottom: 10px;
-}
-
-.anime-meta {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 20px 0;
-}
-
-.anime-meta li {
-  margin-bottom: 5px;
-  font-size: 14px;
-}
-
 .dropdown {
+  margin-top: 10px;
   position: relative;
-  margin-top: 12px;
+  width: 100%;
 }
 
-#dropdownBtn {
+.dropdownBtn {
   background-color: #4F46E5;
   color: white;
-  padding: 10px 16px;
-  font-size: 14px;
+  padding: 10px 14px;
   border: none;
   border-radius: 6px;
-  cursor: pointer;
   width: 100%;
+  cursor: pointer;
+  font-size: 14px;
 }
 
 .dropdown-menu {
   display: none;
   position: absolute;
-  top: 110%;
+  top: 105%;
   left: 0;
-  background-color: white;
-  min-width: 100%;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   border-radius: 6px;
-  z-index: 1000;
+  z-index: 10;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
 }
 
 .dropdown-menu a {
-  color: #333;
-  padding: 10px 14px;
-  text-decoration: none;
   display: block;
+  padding: 10px 12px;
+  text-decoration: none;
+  color: #333;
 }
 
 .dropdown-menu a:hover {
   background-color: #f0f0f0;
 }
 
-.anime-description {
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+.anime-details {
+  flex: 1;
 }
 
-.anime-description h2 {
-  margin-top: 0;
+.anime-title {
   font-size: 22px;
   margin-bottom: 10px;
 }
 
-/* PLAYER SECTION */
-.player-section {
-  margin-top: 30px;
-  padding: 30px 20px;
-  background-color: #f8f9fa;
+.anime-meta {
+  list-style: none;
+  font-size: 14px;
+}
+
+.anime-meta li {
+  margin-bottom: 6px;
+}
+
+/* ───── Main Content ───── */
+.main-content-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Anime content area */
+.anime-content {
+  flex: 1 1 65%;
+  min-width: 300px;
+  background: #fff;
+  padding: 20px;
   border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Description */
+.anime-description h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.anime-description p {
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ───── Player + Tabs Frame ───── */
+.player-section {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+/* Video Player */
+.anime-player {
+  flex: 1 1 65%;
+  min-width: 280px;
 }
 
 .anime-player h2 {
-  font-size: 22px;
-  margin-bottom: 15px;
+  font-size: 20px;
+  margin-bottom: 10px;
 }
 
 .player-wrapper {
   position: relative;
-  padding-top: 56.25%; /* 16:9 */
+  padding-top: 56.25%;
   height: 0;
-  overflow: hidden;
   border-radius: 12px;
+  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  margin-bottom: 25px;
 }
 
 .player-wrapper iframe {
@@ -143,36 +175,137 @@ body {
   border-radius: 12px;
 }
 
-/* EPISODE LIST */
+/* Tabs on the right */
+.video-player-side {
+  flex: 1 1 30%;
+  min-width: 220px;
+  max-width: 300px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+/* Tab Navigation */
+.tabs-container {
+  width: 100%;
+}
+
+.nav {
+  display: flex;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+
+.nav-item {
+  flex: 1;
+}
+
+.nav-link {
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  font-weight: bold;
+  color: #4F46E5;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+}
+
+.nav-link.active,
+.nav-link:hover {
+  border-color: #4F46E5;
+  color: #3b36c3;
+}
+
+/* Tab Content */
+.tab-content {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.tab-pane {
+  display: none;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+.video-player-toggle-item {
+  background: #f0f0ff;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #4F46E5;
+  font-weight: 500;
+  user-select: none;
+}
+
+.video-player-toggle-item:hover,
+.video-player-toggle-item.active {
+  background: #c7c3f7;
+}
+
+/* ───── Episode List ───── */
+.episode-list {
+  margin-top: 20px;
+}
+
 .episode-list h3 {
-  font-size: 20px;
+  font-size: 18px;
   margin-bottom: 10px;
 }
 
 .episode-list ul {
   list-style: none;
-  padding-left: 0;
-  margin: 0;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
   gap: 10px;
-}
-
-.episode-list li {
-  margin: 0;
+  padding: 0;
 }
 
 .episode-list a {
-  display: inline-block;
+  display: block;
+  padding: 10px 14px;
   background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  text-align: center;
   color: #333;
   text-decoration: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
   transition: background-color 0.2s;
 }
 
 .episode-list a:hover {
   background-color: #e2e6ea;
+}
+
+/* ───── Responsive ───── */
+@media (max-width: 768px) {
+  .main-content-wrapper {
+    flex-direction: column;
+  }
+
+  .player-section {
+    flex-direction: column;
+  }
+
+  .anime-content,
+  .anime-player,
+  .video-player-side {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
+
+  .nav {
+    flex-direction: row;
+  }
+
+  .nav-link {
+    font-size: 14px;
+  }
 }
