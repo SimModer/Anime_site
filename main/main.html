@@ -4,60 +4,90 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MySite - Anime Schedule</title>
-  <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header>
-    <div class="logo">MySite</div>
-    <nav aria-label="Site navigation and authentication">
-      <div class="search-box">
-        <input type="text" placeholder="Search..." aria-label="Search">
+    <div class="header-container">
+      <div class="logo">MySite</div>
+      <nav aria-label="Site navigation and authentication">
+        <div class="search-box">
+          <input type="text" placeholder="ძებნა..." aria-label="Search anime">
+        </div>
+      </nav>
+      <div class="auth-buttons">
+        <button type="button" aria-label="Register">რეგისტრაცია</button>
+        <button type="button" aria-label="Login">შესვლა</button>
       </div>
-    </nav>
-    <div class="auth-buttons">
-      <button>რეგისტრაცია</button>
-      <button>შესვლა</button>
     </div>
   </header>
+  
   <main>
-    <button>ახალი დამატებული ანიმეები</button>
+    <button class="new-anime-button" type="button">ახალი დამატებული ანიმეები</button>
+    
     <section id="schedule-panel">
       <div class="panel-title">ანიმეს განრიგი</div>
+      <div class="loading-indicator">Loading anime schedule...</div>
       <section id="schedule">
-        <!-- Days, now toggles only arrow, no text -->
         <details>
-          <summary><span class="day-label">ორშაბათი</span><span class="toggle-link"></span></summary>
+          <summary>
+            <span class="day-label">ორშაბათი</span>
+            <span class="toggle-link" aria-hidden="true"></span>
+          </summary>
           <div class="anime-list"></div>
         </details>
         <details>
-          <summary><span class="day-label">სამშაბათი</span><span class="toggle-link"></span></summary>
+          <summary>
+            <span class="day-label">სამშაბათი</span>
+            <span class="toggle-link" aria-hidden="true"></span>
+          </summary>
           <div class="anime-list"></div>
         </details>
         <details>
-          <summary><span class="day-label">ოთხშაბათი</span><span class="toggle-link"></span></summary>
+          <summary>
+            <span class="day-label">ოთხშაბათი</span>
+            <span class="toggle-link" aria-hidden="true"></span>
+          </summary>
           <div class="anime-list"></div>
         </details>
         <details>
-          <summary><span class="day-label">ხუთშაბათი</span><span class="toggle-link"></span></summary>
+          <summary>
+            <span class="day-label">ხუთშაბათი</span>
+            <span class="toggle-link" aria-hidden="true"></span>
+          </summary>
           <div class="anime-list"></div>
         </details>
         <details>
-          <summary><span class="day-label">პარასკევი</span><span class="toggle-link"></span></summary>
+          <summary>
+            <span class="day-label">პარასკევი</span>
+            <span class="toggle-link" aria-hidden="true"></span>
+          </summary>
           <div class="anime-list"></div>
         </details>
         <details>
-          <summary><span class="day-label">შაბათი</span><span class="toggle-link"></span></summary>
+          <summary>
+            <span class="day-label">შაბათი</span>
+            <span class="toggle-link" aria-hidden="true"></span>
+          </summary>
           <div class="anime-list"></div>
         </details>
         <details>
-          <summary><span class="day-label">კვირა</span><span class="toggle-link"></span></summary>
+          <summary>
+            <span class="day-label">კვირა</span>
+            <span class="toggle-link" aria-hidden="true"></span>
+          </summary>
           <div class="anime-list"></div>
         </details>
       </section>
     </section>
-    <div>სიახლეები</div>
+    
+    <div class="news-section">
+      <div class="news-title">სიახლეები</div>
+      <!-- News items will be populated here -->
+    </div>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
