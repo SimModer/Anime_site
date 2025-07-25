@@ -1,29 +1,85 @@
 <!DOCTYPE html>
-<html lang="ka"> <!-- Georgian language code -->
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>პროფილი</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <div class="container">
-        <!-- Left Sidebar - Profile Info -->
-        <div class="profile-sidebar">
-            <div class="profile-avatar"></div>
-            <div class="profile-name">nickname</div>
-        </div>
-
-        <!-- Main Content -->
+        <!-- Left Content - Profile and Anime List -->
         <div class="main-content">
-            <!-- Anime List Section -->
-            <div class="section">
-                <div class="section-header">
-                    <div class="section-title">ანიმეს სია</div>
-                    <div class="section-count">0</div>
+            <!-- Profile Section -->
+            <div class="profile-sidebar">
+                <div class="profile-avatar"></div>
+                <div class="profile-name"></div>
+            </div>
+
+            <!-- Anime Stats Section (without frame) -->
+            <div class="anime-stats-section">
+                <div class="anime-header">
+                    <div class="anime-title">სულ ნანახი ანიმე</div>
+                    <div class="anime-total-count">0</div>
                 </div>
-                <div class="anime-list">
-                    <!-- Empty anime list -->
+                
+                <div class="progress-bar">
+                    <div class="progress-segments">
+                        <div class="progress-segment segment-planned" style="width: 0%;"></div>
+                        <div class="progress-segment segment-watching" style="width: 0%;"></div>
+                        <div class="progress-segment segment-completed" style="width: 0%;"></div>
+                        <div class="progress-segment segment-dropped" style="width: 0%;"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-labels">
+                    <div class="progress-label">
+                        <div class="label-dot segment-planned"></div>
+                        <span>დაგეგმილი (0)</span>
+                    </div>
+                    <div class="progress-label">
+                        <div class="label-dot segment-watching"></div>
+                        <span>ვუყურებ (0)</span>
+                    </div>
+                    <div class="progress-label">
+                        <div class="label-dot segment-completed"></div>
+                        <span>ნანახი (0)</span>
+                    </div>
+                    <div class="progress-label">
+                        <div class="label-dot segment-dropped"></div>
+                        <span>მიტოვებული (0)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom sections in one row -->
+            <div class="bottom-sections">
+                <!-- Friends Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-title">მეგობრები</div>
+                    </div>
+                    <div class="friends-grid">
+                        <div class="friend-avatar">А1</div>
+                        <div class="friend-avatar">А2</div>
+                        <div class="friend-avatar">А3</div>
+                        <div class="friend-avatar">А4</div>
+                        <div class="friend-avatar">А5</div>
+                        <div class="friend-avatar">А6</div>
+                    </div>
+                </div>
+
+                <!-- Favorites Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-title">რჩეული</div>
+                    </div>
+                    <div class="favorites-grid">
+                        <div class="favorite-item">Fav 1</div>
+                        <div class="favorite-item">Fav 2</div>
+                        <div class="favorite-item">Fav 3</div>
+                        <div class="favorite-item">Fav 4</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -36,34 +92,6 @@
                     <div class="section-title">ისტორია</div>
                 </div>
                 <!-- Empty history -->
-            </div>
-
-            <!-- Friends Section -->
-            <div class="friends-section">
-                <div class="section-header">
-                    <div class="section-title">მეგობრები</div>
-                </div>
-                <div class="friends-grid">
-                    <div class="friend-avatar">А1</div>
-                    <div class="friend-avatar">А2</div>
-                    <div class="friend-avatar">А3</div>
-                    <div class="friend-avatar">А4</div>
-                    <div class="friend-avatar">А5</div>
-                    <div class="friend-avatar">А6</div>
-                </div>
-            </div>
-
-            <!-- Favorites Section -->
-            <div class="favorites-section">
-                <div class="section-header">
-                    <div class="section-title">რჩეული</div>
-                </div>
-                <div class="favorites-grid">
-                    <div class="favorite-item">Fav 1</div>
-                    <div class="favorite-item">Fav 2</div>
-                    <div class="favorite-item">Fav 3</div>
-                    <div class="favorite-item">Fav 4</div>
-                </div>
             </div>
         </div>
     </div>
