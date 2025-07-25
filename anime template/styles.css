@@ -43,6 +43,7 @@ body {
 .anime-image img {
   width: 100%;
   border-radius: 12px;
+  object-fit: cover;
 }
 
 .dropdown {
@@ -91,11 +92,14 @@ body {
 
 .anime-details {
   flex: 1;
+  min-width: 200px;
 }
 
 .anime-title {
-  font-size: 22px;
-  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #1a1a1a;
 }
 
 .anime-meta {
@@ -105,6 +109,7 @@ body {
 
 .anime-meta li {
   margin-bottom: 6px;
+  color: #555;
 }
 
 /* ───── Main Content ───── */
@@ -125,15 +130,17 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Description */
 .anime-description h2 {
   font-size: 20px;
   margin-bottom: 10px;
+  color: #222;
 }
 
 .anime-description p {
   font-size: 15px;
-  line-height: 1.6;
+  line-height: 1.7;
+  white-space: pre-line; /* preserves line breaks */
+  color: #444;
 }
 
 /* ───── Player + Tabs Frame ───── */
@@ -186,7 +193,6 @@ body {
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* Tab Navigation */
 .tabs-container {
   width: 100%;
 }
@@ -220,7 +226,6 @@ body {
   color: #3b36c3;
 }
 
-/* Tab Content */
 .tab-content {
   max-height: 300px;
   overflow-y: auto;
@@ -250,7 +255,7 @@ body {
   background: #c7c3f7;
 }
 
-/* ───── Episode List ───── */
+/* ───── Episode List (Optional Add-on) ───── */
 .episode-list {
   margin-top: 20px;
 }
