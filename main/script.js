@@ -1,11 +1,11 @@
-// Constants (frozen for immutability)
+// Constants
 const DAY_REMAP = Object.freeze([6, 0, 1, 2, 3, 4, 5]);
-const daysGeorgian = Object.freeze([
+const DAYS_GEORGIAN = Object.freeze([
   "ორშაბათი", "სამშაბათი", "ოთხშაბათი",
   "ხუთშაბათი", "პარასკევი", "შაბათი", "კვირა"
 ]);
-const monthsGeorgian = Object.freeze([
-  "იან", "თებ", "მარ", "აპრ", "მაი", "ივნ", 
+const MONTHS_GEORGIAN = Object.freeze([
+  "იან", "თებ", "მარ", "აპრ", "მაი", "ივნ",
   "ივლ", "აგვ", "სექ", "ოქტ", "ნოე", "დეკ"
 ]);
 const CONFIG = Object.freeze({
@@ -14,84 +14,87 @@ const CONFIG = Object.freeze({
   ANIMATION_DURATION: 300
 });
 
-// State
+// App State
 const AppState = {
   searchTerm: '',
   isLoading: false,
   animeData: new Map()
 };
 
-// DOM Ready
+// Initialization
 document.addEventListener("DOMContentLoaded", () => {
-  setupTodayHighlight();
-  setupEventListeners();
+  highlightToday();
+  attachEventListeners();
   fetchAnimeSchedule();
 });
 
-function setupTodayHighlight() {
+// Highlight current day
+function highlightToday() {
   const todayIndex = DAY_REMAP[new Date().getDay()];
-  const details = document.querySelectorAll("#schedule details")[todayIndex];
+  const todayDetails = document.querySelectorAll("#schedule details")[todayIndex];
 
-  if (details) {
-    details.open = true;
-    const summary = details.querySelector("summary");
-    if (summary) {
-      summary.classList.add("today");
-      summary.textContent = summary.textContent.replace(/\s*\(დღეს\)/, "");
-    }
+  if (!todayDetails) return;
+
+  todayDetails.open = true;
+  const summary = todayDetails.querySelector("summary");
+  if (summary) {
+    summary.classList.add("today");
+    summary.textContent = summary.textContent.replace(/\s*\(დღეს\)/, "");
   }
 }
 
-function setupEventListeners() {
-  const searchInput = document.querySelector('.search-box input');
-  if (searchInput) searchInput.addEventListener('input', debounce(handleSearch, 300));
+// Event listeners
+function attachEventListeners() {
+  const input = document.querySelector('.search-box input');
+  if (input) input.addEventListener('input', debounce(handleSearch, 300));
 
-  document.querySelectorAll('#schedule details').forEach(detail => {
-    detail.addEventListener('toggle', handleDetailsToggle);
-  });
+  document.querySelectorAll('#schedule details').forEach(detail =>
+    detail.addEventListener('toggle', onDetailToggle)
+  );
 
-  document.querySelectorAll('.news-item').forEach(item => {
-    item.addEventListener('click', handleNewsClick);
-  });
+  document.querySelectorAll('.news-item').forEach(item =>
+    item.addEventListener('click', onNewsClick)
+  );
 
-  document.querySelector('.new-anime-button')?.addEventListener('click', handleNewAnimeClick);
+  const newAnimeBtn = document.querySelector('.new-anime-button');
+  if (newAnimeBtn) newAnimeBtn.addEventListener('click', onNewAnimeClick);
 
-  document.querySelectorAll('.auth-buttons button').forEach(btn => {
-    btn.addEventListener('click', handleAuthClick);
-  });
+  document.querySelectorAll('.auth-buttons button').forEach(btn =>
+    btn.addEventListener('click', onAuthClick)
+  );
 }
 
+// Handle search
 function handleSearch(e) {
-  AppState.searchTerm = e.target.value.toLowerCase().trim();
-  console.log('Searching for:', AppState.searchTerm);
+  const term = e.target.value.toLowerCase().trim();
+  AppState.searchTerm = term;
 
   document.querySelectorAll('.anime-item').forEach(item => {
     const title = item.querySelector('.anime-title')?.textContent.toLowerCase() || '';
-    const match = !AppState.searchTerm || title.includes(AppState.searchTerm);
+    const match = !term || title.includes(term);
     item.style.display = match ? 'flex' : 'none';
     if (match) item.classList.add('fade-in-up');
   });
 }
 
-function handleDetailsToggle(e) {
+// Toggle animation on expand
+function onDetailToggle(e) {
   if (e.target.open) {
-    e.target.querySelector('.anime-list')?.classList.add('fade-in-up');
+    const list = e.target.querySelector('.anime-list');
+    if (list) list.classList.add('fade-in-up');
   }
 }
 
-function handleNewsClick(e) {
+// News click animation
+function onNewsClick(e) {
   const item = e.currentTarget;
-  const title = item.querySelector('h3')?.textContent || 'Unknown';
-
-  console.log('News item clicked:', title);
   item.style.transform = 'scale(0.98)';
-  setTimeout(() => item.style.transform = 'scale(1)', 150);
+  setTimeout(() => (item.style.transform = 'scale(1)'), 150);
 }
 
-function handleNewAnimeClick(e) {
+// New anime click
+function onNewAnimeClick(e) {
   const btn = e.target;
-  console.log('New anime button clicked');
-
   const originalText = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Loading...';
@@ -102,20 +105,19 @@ function handleNewAnimeClick(e) {
   }, 1000);
 }
 
-function handleAuthClick(e) {
+// Auth button feedback
+function onAuthClick(e) {
   const btn = e.target;
-  const action = btn.textContent.trim();
-  console.log('Auth button clicked:', action);
-
   btn.style.transform = 'scale(0.95)';
-  setTimeout(() => btn.style.transform = 'scale(1)', 100);
+  setTimeout(() => (btn.style.transform = 'scale(1)'), 100);
 }
 
+// Fetch schedule from AniList
 async function fetchAnimeSchedule() {
   if (AppState.isLoading) return;
 
   AppState.isLoading = true;
-  showLoadingState(true);
+  toggleLoading(true);
 
   const query = `
     query {
@@ -130,7 +132,8 @@ async function fetchAnimeSchedule() {
           }
         }
       }
-    }`;
+    }
+  `;
 
   try {
     const res = await fetch(CONFIG.API_URL, {
@@ -139,114 +142,120 @@ async function fetchAnimeSchedule() {
       body: JSON.stringify({ query })
     });
 
-    if (!res.ok) throw new Error(`Network error: ${res.statusText}`);
-    const data = await res.json();
+    if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+    const json = await res.json();
+    const schedules = json?.data?.Page?.airingSchedules;
+    if (!schedules) throw new Error("No schedule data");
 
-    if (!data?.data?.Page?.airingSchedules) {
-      throw new Error("Invalid data format received from API");
-    }
-
-    processAnimeSchedule(data.data.Page.airingSchedules);
+    processSchedules(schedules);
   } catch (err) {
-    console.error("Failed to fetch anime schedule:", err);
-    showErrorMessage("Failed to load anime schedule. Please try again later.");
+    console.error(err);
+    showError("დაფიქსირდა შეცდომა. სცადეთ მოგვიანებით.");
   } finally {
     AppState.isLoading = false;
-    showLoadingState(false);
+    toggleLoading(false);
   }
 }
 
-function processAnimeSchedule(schedules) {
+// Process API data
+function processSchedules(schedules) {
   AppState.animeData.clear();
   const nextEpisodes = new Map();
 
-  schedules.forEach(item => {
+  for (const item of schedules) {
     const id = item.media?.id;
-    if (!id) return;
-    if (!nextEpisodes.has(id) || item.airingAt < nextEpisodes.get(id).airingAt) {
+    if (!id) continue;
+
+    const existing = nextEpisodes.get(id);
+    if (!existing || item.airingAt < existing.airingAt) {
       nextEpisodes.set(id, item);
     }
-  });
+  }
 
-  const detailsList = document.querySelectorAll("#schedule details");
-
-  nextEpisodes.forEach(item => {
+  nextEpisodes.forEach((item) => {
     const date = new Date(item.airingAt * 1000);
     const dayIndex = DAY_REMAP[date.getDay()];
-    insertAnimeItem(item, detailsList[dayIndex], date);
+    insertAnimeItem(item, dayIndex, date);
   });
 
   AppState.animeData = nextEpisodes;
-  console.log(`Loaded ${nextEpisodes.size} anime episodes`);
 }
 
-function insertAnimeItem(item, section, airingDate) {
-  const list = section?.querySelector(".anime-list");
+// Insert item into DOM
+function insertAnimeItem(item, dayIndex, airingDate) {
+  const details = document.querySelectorAll("#schedule details")[dayIndex];
+  const list = details?.querySelector(".anime-list");
   if (!list) return;
 
-  const title = item.media?.title?.romaji || "Unknown Title";
-  const cover = item.media?.coverImage?.medium || "";
-  const episode = item.episode || "?";
-  const formattedDate = formatGeorgianDate(airingDate);
+  const { id, title, coverImage } = item.media;
+  const html = createAnimeHTML({
+    animeId: id,
+    title: title?.romaji || "Untitled",
+    cover: coverImage?.medium || "",
+    episode: item.episode || "?",
+    date: formatDate(airingDate)
+  });
 
-  list.insertAdjacentHTML("beforeend", createAnimeItemHTML({
-    cover, title, episode, formattedDate, animeId: item.media?.id
-  }));
+  list.insertAdjacentHTML("beforeend", html);
 }
 
-function createAnimeItemHTML({ cover, title, episode, formattedDate, animeId }) {
+// Create HTML string for anime
+function createAnimeHTML({ cover, title, episode, date, animeId }) {
   return `
     <div class="anime-item" data-anime-id="${animeId}">
-      <img src="${cover}" alt="${escapeHTML(title)} Cover Image" loading="lazy" />
+      <img src="${cover}" alt="${escapeHTML(title)} Cover" loading="lazy" />
       <div class="anime-details">
         <div class="anime-title">${escapeHTML(title)}</div>
         <div class="anime-meta">
           ${episode} სერია<br>
-          <span class="anime-time">(${formattedDate})</span>
+          <span class="anime-time">(${date})</span>
         </div>
       </div>
-    </div>`;
+    </div>
+  `;
 }
 
-function formatGeorgianDate(date) {
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = monthsGeorgian[date.getMonth()];
-  const hour = String(date.getHours()).padStart(2, "0");
-  const minute = String(date.getMinutes()).padStart(2, "0");
-  return `${day} ${month}, ${hour}:${minute}`;
+// Format Georgian date
+function formatDate(date) {
+  const d = date.getDate().toString().padStart(2, "0");
+  const m = MONTHS_GEORGIAN[date.getMonth()];
+  const h = date.getHours().toString().padStart(2, "0");
+  const min = date.getMinutes().toString().padStart(2, "0");
+  return `${d} ${m}, ${h}:${min}`;
 }
 
-function showLoadingState(isLoading) {
-  const el = document.querySelector('.loading-indicator');
-  if (el) el.style.display = isLoading ? 'block' : 'none';
+// Toggle loading visibility
+function toggleLoading(show) {
+  const loader = document.querySelector('.loading-indicator');
+  if (loader) loader.style.display = show ? 'block' : 'none';
 }
 
-function showErrorMessage(msg) {
-  let errorEl = document.querySelector('.error-message');
-  if (!errorEl) {
-    errorEl = document.createElement('div');
-    errorEl.className = 'error-message';
-    document.querySelector('#schedule')?.prepend(errorEl);
+// Show error to user
+function showError(msg) {
+  let el = document.querySelector('.error-message');
+  if (!el) {
+    el = document.createElement('div');
+    el.className = 'error-message';
+    document.querySelector('#schedule')?.prepend(el);
   }
-
-  errorEl.textContent = msg;
-  errorEl.style.display = 'block';
-
-  setTimeout(() => errorEl.style.display = 'none', 5000);
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => el.style.display = 'none', 5000);
 }
 
+// Debounce utility
 function debounce(fn, delay) {
-  let timeout;
+  let timer;
   return (...args) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => fn(...args), delay);
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
   };
 }
 
+// Escape HTML
 function escapeHTML(str) {
-  const escapeMap = {
+  return str.replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;',
     '"': '&quot;', "'": '&#039;'
-  };
-  return str.replace(/[&<>"']/g, m => escapeMap[m]);
+  })[char]);
 }
