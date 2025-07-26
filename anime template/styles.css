@@ -58,8 +58,6 @@ header {
   text-decoration: none;
 }
 
-
-
 .container {
   max-width: 1400px;
   margin: 0 auto;
@@ -261,7 +259,7 @@ header {
   border: none;
 }
 
-/* Video Player Side Tabs */
+/* Video Player Side Panel */
 .video-player-side {
   flex: 1 1 30%;
   min-width: 280px;
@@ -274,98 +272,109 @@ header {
   height: fit-content;
 }
 
-.tabs-container {
-  width: 100%;
-}
-
-.nav {
-  display: flex;
-  border-bottom: 2px solid var(--glass-border);
+.player-controls h3 {
+  font-size: 18px;
   margin-bottom: 20px;
-  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-  overflow: hidden;
-}
-
-.nav-item {
-  flex: 1;
-}
-
-.nav-link {
-  background: var(--white-soft);
-  border: none;
-  padding: 12px 16px;
-  font-weight: bold;
-  color: var(--text-muted);
-  cursor: pointer;
-  text-align: center;
-  width: 100%;
-  transition: var(--transition);
-  border-bottom: 3px solid transparent;
-}
-
-.nav-link.active {
-  background: var(--primary);
-  color: var(--text-light);
-  border-bottom-color: var(--primary-alt);
-}
-
-.nav-link:hover:not(.active) {
-  background: var(--white-hover);
   color: var(--primary);
+  text-align: center;
+  border-bottom: 2px solid var(--glass-border);
+  padding-bottom: 10px;
 }
 
-.tab-content {
-  max-height: 350px;
-  overflow-y: auto;
-  padding-right: 5px;
+/* Dubbing Selection */
+.dubbing-section {
+  margin-bottom: 25px;
 }
 
-.tab-content::-webkit-scrollbar {
-  width: 6px;
+.dubbing-section h4 {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
-.tab-content::-webkit-scrollbar-track {
-  background: var(--white-soft);
-  border-radius: 3px;
+.dubbing-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.tab-content::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 3px;
-}
-
-.tab-pane {
-  display: none;
-}
-
-.tab-pane.active {
-  display: block;
-  animation: fadeIn 0.3s ease;
-}
-
-.video-player-toggle-item {
+.dubbing-option {
   background: var(--white-soft);
   padding: 12px 16px;
-  margin-bottom: 10px;
   border-radius: var(--radius-sm);
   cursor: pointer;
   color: var(--text-light);
   font-weight: 500;
   transition: var(--transition);
   border-left: 4px solid transparent;
+  margin-bottom: 8px;
 }
 
-.video-player-toggle-item:hover {
+.dubbing-option:hover {
   background: var(--white-hover);
   border-left-color: var(--primary);
   color: var(--primary);
   transform: translateX(5px);
 }
 
-.video-player-toggle-item.active {
+.dubbing-option.active {
   background: rgba(78, 205, 196, 0.2);
   border-left-color: var(--primary);
   color: var(--primary);
+}
+
+/* Player Selection Section */
+.player-selection-section {
+  margin-top: 25px;
+}
+
+.player-selection-section h4 {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.player-options {
+  position: relative;
+}
+
+.player-list {
+  display: none;
+}
+
+.player-list.active {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+.player-item {
+  background: var(--white-soft);
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text-light);
+  font-weight: 400;
+  font-size: 14px;
+  transition: var(--transition);
+  border-left: 3px solid transparent;
+}
+
+.player-item:hover {
+  background: var(--white-hover);
+  border-left-color: var(--primary-alt);
+  color: var(--primary);
+  transform: translateX(3px);
+}
+
+.player-item.active {
+  background: rgba(69, 183, 209, 0.2);
+  border-left-color: var(--primary-alt);
+  color: var(--primary-alt);
 }
 
 /* Episode List */
@@ -437,6 +446,19 @@ header {
   }
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    max-height: 300px;
+    transform: translateY(0);
+  }
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .player-section {
@@ -469,10 +491,6 @@ header {
   
   .header-container {
     gap: 15px;
-  }
-  
-  .nav {
-    flex-direction: column;
   }
   
   .episode-grid {

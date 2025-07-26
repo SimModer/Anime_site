@@ -48,49 +48,47 @@
         
         // Close dropdown
         this.closest(".dropdown-menu").classList.remove("show");
-        
-        // Here you would typically send the status to your backend
-        // updateAnimeStatus(animeId, status);
       });
     });
 
-    // Enhanced tab functionality
-    document.querySelectorAll('.video-player-side .nav-link').forEach(tabBtn => {
-      tabBtn.addEventListener('click', function() {
-        const container = this.closest('.video-player-side');
+    // Dubbing option functionality
+    document.querySelectorAll('.dubbing-option').forEach(dubbingBtn => {
+      dubbingBtn.addEventListener('click', function() {
+        const dubbingType = this.dataset.dubbing;
+        const targetList = document.querySelector(`[data-dubbing-target="${dubbingType}"]`);
         
-        // Remove active class from all tabs and panes
-        container.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
-        container.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+        // Remove active class from all dubbing options and player lists
+        document.querySelectorAll('.dubbing-option').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.player-list').forEach(list => list.classList.remove('active'));
         
-        // Activate clicked tab
+        // Activate clicked dubbing option and its player list
         this.classList.add('active');
-        
-        // Activate corresponding pane
-        const targetId = this.getAttribute('data-target');
-        const targetPane = container.querySelector(`#${targetId}`);
-        if (targetPane) {
-          targetPane.classList.add('active');
+        if (targetList) {
+          targetList.classList.add('active');
         }
+        
+        console.log(`Selected dubbing: ${dubbingType}`);
       });
     });
 
-    // Video player toggle items functionality
-    document.querySelectorAll('.video-player-toggle-item').forEach(item => {
-      item.addEventListener('click', function() {
-        // Remove active class from siblings
-        const container = this.closest('.tab-pane');
-        container.querySelectorAll('.video-player-toggle-item').forEach(sibling => {
-          sibling.classList.remove('active');
+    // Player item functionality
+    document.querySelectorAll('.player-item').forEach(playerItem => {
+      playerItem.addEventListener('click', function() {
+        const playerList = this.closest('.player-list');
+        
+        // Remove active class from siblings in the same player list
+        playerList.querySelectorAll('.player-item').forEach(item => {
+          item.classList.remove('active');
         });
         
-        // Add active class to clicked item
+        // Add active class to clicked player
         this.classList.add('active');
         
-        console.log(`Selected option: ${this.textContent.trim()}`);
+        const playerId = this.dataset.player;
+        console.log(`Selected player: ${playerId} - ${this.textContent.trim()}`);
         
         // Here you would typically change the video source
-        // updateVideoSource(this.dataset.source);
+        // updateVideoSource(playerId);
       });
     });
 
@@ -114,29 +112,6 @@
       });
     });
 
-    // Smooth scroll animations for better UX
-    function addScrollAnimations() {
-      const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -50px 0px'
-      };
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
-          }
-        });
-      }, observerOptions);
-
-      document.querySelectorAll('section').forEach(section => {
-        observer.observe(section);
-      });
-    }
-
-    // Initialize animations when page loads
-    document.addEventListener('DOMContentLoaded', addScrollAnimations);
-
     // Add keyboard navigation for better accessibility
     document.addEventListener('keydown', function(e) {
       // Press 'Escape' to close dropdowns
@@ -158,5 +133,17 @@
           ? (currentIndex - 1 + episodes.length) % episodes.length
           : (currentIndex + 1) % episodes.length;
         episodes[nextIndex].focus();
+      }
+    });
+
+    // Initialize - make sure first dubbing's player list is visible
+    document.addEventListener('DOMContentLoaded', function() {
+      const firstDubbing = document.querySelector('.dubbing-option.active');
+      if (firstDubbing) {
+        const dubbingType = firstDubbing.dataset.dubbing;
+        const targetList = document.querySelector(`[data-dubbing-target="${dubbingType}"]`);
+        if (targetList) {
+          targetList.classList.add('active');
+        }
       }
     });
