@@ -10,6 +10,11 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 # Database filename
 db_filename = os.path.join(script_dir, "anime.db")
 
+# If database already exists, remove it
+if os.path.exists(db_filename):
+    os.remove(db_filename)
+    print(f"⚠️ Existing database '{db_filename}' removed, creating a new one.")
+
 # CSV files to import
 csv_files = glob.glob(os.path.join(script_dir, "*.csv"))
 
@@ -52,15 +57,6 @@ def fetch_anilist_info(title):
         coverImage {
           large
         }
-        source
-        status
-        episodes
-        format
-        title {
-          romaji
-          english
-          native
-        }
       }
     }
     '''
@@ -71,7 +67,6 @@ def fetch_anilist_info(title):
         if "data" in data and "Media" in data["data"]:
             media = data["data"]["Media"]
             return {
-                "rating": None,  # AniList rating type not directly matching MyAnimeList
                 "synopsis": media.get("description"),
                 "poster_url": media.get("coverImage", {}).get("large"),
                 "genres": ", ".join(media.get("genres", [])),
@@ -148,7 +143,7 @@ for anime_id, title, rating, synopsis, poster_url, genres in all_rows:
                 score = COALESCE(score, ?)
             WHERE id = ?
             """, (
-                info.get("rating"),
+                None,  # rating left None
                 info.get("synopsis"),
                 info.get("poster_url"),
                 info.get("genres"),
