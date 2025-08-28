@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MySite</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">MySite</div>
+      <nav class="main-nav" aria-label="Site navigation">
+        <div class="search-box">
+          <input type="text" placeholder="ძებნა..." aria-label="ძებნა ანიმე">
+        </div>
+      </nav>
+      <div class="auth-buttons" role="group" aria-label="ავტორიზაცია">
+        <button type="button">რეგისტრაცია</button>
+        <button type="button">შესვლა</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="content-container">
+      <!-- მიმდინარე ანიმეები -->
+      <section id="ongoing-panel">
+        <button class="panel-title-btn" onclick="window.location.href='../ongoing animes/ongoing.html'">
+          მიმდინარე ანიმეები →
+        </button>        
+        <div class="loading-indicator" role="status" aria-live="polite">იტვირთება...</div>
+        <div class="anime-strip" id="anime-grid">
+          <!-- Cards will be injected -->
+        </div>
+      </section>      
+
+      <!-- სიახლეები -->
+      <section class="news-section">
+        <h2 class="news-title">სიახლეები</h2>
+      </section>
+    </div>
+  </main>
+  <script src="script.js" defer></script>
+</body>
+</html>

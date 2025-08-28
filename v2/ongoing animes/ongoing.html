@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>მიმდინარე ანიმეები</title>
+  <link rel="stylesheet" href="ongoing.css">
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <div class="logo">MySite</div>
+      <button class="back-btn" onclick="window.location.href='../Main/main.html'">
+        ← უკან
+      </button>      
+    </div>
+  </header>
+
+  <main>
+    <div class="content-container">
+      <h2 class="page-title">ყველა მიმდინარე ანიმე</h2>
+      <div class="loading-indicator" role="status" aria-live="polite">იტვირთება...</div>
+      <div class="anime-grid" id="anime-grid">
+        <!-- Cards populated here -->
+      </div>
+    </div>
+  </main>
+
+  <script src="ongoing.js" defer></script>
+</body>
+</html>
