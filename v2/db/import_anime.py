@@ -2,150 +2,101 @@ import sqlite3
 import csv
 import os
 import glob
-import requests
-import time
+import sys
 
-# Folder of the script
-script_dir = os.path.dirname(os.path.abspath(__file__))
+DB_NAME = "media.db"
 
-# Database filename
-db_filename = os.path.join(script_dir, "media.db")
+# Target DB schema
+MEDIA_COLUMNS = [
+    "id", "name", "english_name", "japanese_name", "other_name", "russian",
+    "url", "kind", "type", "episodes", "episodes_aired",
+    "volumes", "chapters", "aired", "aired_on", "released_on",
+    "premiered", "producers", "licensors", "studios", "source",
+    "duration", "rating", "ranked", "popularity", "score",
+    "genres", "status", "synopsis", "poster_url"
+]
 
-# Remove existing DB if exists
-if os.path.exists(db_filename):
-    os.remove(db_filename)
-    print(f"⚠️ Existing database '{db_filename}' removed, creating a new one.")
+# CSV headers → DB columns
+HEADER_MAPPING = {
+    "MAL_ID": "id", "anime_id": "id", "id": "id",
+    "Name": "name", "name": "name", "English name": "english_name",
+    "Japanese name": "japanese_name", "Other name": "other_name", "russian": "russian",
+    "url": "url", "Image URL": "poster_url",
+    "kind": "kind", "Type": "type", "type": "type",
+    "Episodes": "episodes", "episodes": "episodes", "episodes_aired": "episodes_aired",
+    "volumes": "volumes", "chapters": "chapters",
+    "Aired": "aired", "aired_on": "aired_on", "released_on": "released_on", "Premiered": "premiered",
+    "Producers": "producers", "Licensors": "licensors", "Studios": "studios", "Source": "source",
+    "Duration": "duration", "Rating": "rating", "Ranked": "ranked", "Rank": "ranked",
+    "Popularity": "popularity", "Score": "score", "score": "score",
+    "Genres": "genres", "genre": "genres",
+    "Status": "status", "status": "status",
+    "Synopsis": "synopsis", "synopsis": "synopsis", "sypnopsis": "synopsis"
+}
 
-# Auto-detect all CSV files
-csv_files = glob.glob(os.path.join(script_dir, "*.csv"))
-if not csv_files:
-    exit()
+def get_script_dir():
+    return os.path.dirname(os.path.abspath(__file__))
 
-# Connect to SQLite database
-conn = sqlite3.connect(db_filename)
-cursor = conn.cursor()
+def find_csv_files(script_dir):
+    files = glob.glob(os.path.join(script_dir, "*.csv"))
+    if not files:
+        print("❌ No CSV files found. Exiting.")
+        sys.exit()
+    return files
 
-# Create media table (anime, manga, novels)
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS media (
-    id INTEGER PRIMARY KEY,
-    title TEXT,
-    type TEXT,
-    episodes INTEGER,
-    chapters INTEGER,
-    volumes INTEGER,
-    status TEXT,
-    rating TEXT,
-    score REAL,
-    synopsis TEXT,
-    poster_url TEXT,
-    genres TEXT,
-    start_date TEXT,
-    end_date TEXT
-)
-""")
-conn.commit()
+def create_media_table(cursor):
+    cursor.execute(f"""
+    CREATE TABLE IF NOT EXISTS media (
+        id INTEGER PRIMARY KEY, name TEXT, english_name TEXT, japanese_name TEXT,
+        other_name TEXT, russian TEXT, url TEXT, kind TEXT, type TEXT,
+        episodes INTEGER, episodes_aired INTEGER, volumes INTEGER, chapters INTEGER,
+        aired TEXT, aired_on TEXT, released_on TEXT, premiered TEXT,
+        producers TEXT, licensors TEXT, studios TEXT, source TEXT,
+        duration TEXT, rating TEXT, ranked INTEGER, popularity INTEGER,
+        score REAL, genres TEXT, status TEXT, synopsis TEXT, poster_url TEXT
+    )
+    """)
 
-# Function to import CSV
-def import_csv(filename):
+def map_row(row):
+    """Map CSV row to DB columns efficiently."""
+    return {col: row.get(csv_col, None) for csv_col, col in HEADER_MAPPING.items() if csv_col in row}
+
+def import_csv(cursor, filename):
     with open(filename, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            media_id = row.get("id")
-            title = row.get("name") or row.get("title")
-            type_ = row.get("kind") or row.get("type")  # anime, manga, novel
-            status = row.get("status")
-            score = row.get("score") or row.get("rating")
-            episodes = row.get("episodes") if type_ == "anime" else None
-            chapters = row.get("chapters") if type_ == "manga" else None
-            volumes = row.get("volumes")
-            start_date = row.get("aired_on") or row.get("published_on") or row.get("start_date")
-            end_date = row.get("released_on") or row.get("end_date")
+            mapped = {col: None for col in MEDIA_COLUMNS}
+            mapped.update(map_row(row))
+            values = [mapped[col] for col in MEDIA_COLUMNS]
+            cursor.execute(f"""
+                INSERT OR REPLACE INTO media ({','.join(MEDIA_COLUMNS)})
+                VALUES ({','.join('?' for _ in MEDIA_COLUMNS)})
+            """, values)
+    print(f"✅ Imported/updated {os.path.basename(filename)}")
 
-            cursor.execute("""
-            INSERT OR IGNORE INTO media (
-                id, title, type, episodes, chapters, volumes, status,
-                rating, score, synopsis, poster_url, genres, start_date, end_date
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                media_id, title, type_, episodes, chapters, volumes, status,
-                None, score, None, None, None, start_date, end_date
-            ))
-    print(f"✅ Imported {os.path.basename(filename)}")
+def remove_duplicates(cursor):
+    cursor.execute("""
+        DELETE FROM media
+        WHERE rowid NOT IN (
+            SELECT MAX(rowid) FROM media GROUP BY id
+        )
+    """)
+    print("🗑️ Removed duplicate rows by id (kept latest).")
 
-# Import all CSV files
-for file in csv_files:
-    import_csv(file)
-conn.commit()
+def main():
+    script_dir = get_script_dir()
+    db_path = os.path.join(script_dir, DB_NAME)
+    csv_files = find_csv_files(script_dir)
 
-# Remove duplicates based on ID, keep first
-cursor.execute("""
-DELETE FROM media
-WHERE rowid NOT IN (
-    SELECT MIN(rowid)
-    FROM media
-    GROUP BY id
-)
-""")
-conn.commit()
-
-# AniList GraphQL endpoint
-ANILIST_API = "https://graphql.anilist.co"
-
-# Function to fetch media info from AniList (errors silently skipped)
-def fetch_anilist_data(title, type_):
-    media_type = "ANIME" if type_ == "anime" else "MANGA"
-    query = '''
-    query ($search: String, $type: MediaType) {
-      Media(search: $search, type: $type) {
-        averageScore
-        description(asHtml: false)
-        genres
-        coverImage { large }
-      }
-    }
-    '''
-    variables = {"search": title, "type": media_type}
-    try:
-        response = requests.post(ANILIST_API, json={'query': query, 'variables': variables}, timeout=10)
-        data = response.json()
-        media = data.get("data", {}).get("Media")
-        if media:
-            return {
-                "rating": None,
-                "synopsis": media.get("description"),
-                "poster_url": media.get("coverImage", {}).get("large"),
-                "genres": ", ".join(media.get("genres", [])),
-                "score": media.get("averageScore")
-            }
-    except:
-        return {}
-    return {}
-
-# Update missing info from AniList
-cursor.execute("SELECT id, title, type FROM media WHERE synopsis IS NULL OR poster_url IS NULL OR genres IS NULL")
-rows = cursor.fetchall()
-print(f"ℹ️ Updating {len(rows)} items with AniList API...")
-
-for media_id, title, type_ in rows:
-    info = fetch_anilist_data(title, type_)
-    if info:
-        cursor.execute("""
-        UPDATE media
-        SET rating = ?, synopsis = ?, poster_url = ?, genres = ?, score = ?
-        WHERE id = ?
-        """, (
-            info.get("rating"),
-            info.get("synopsis"),
-            info.get("poster_url"),
-            info.get("genres"),
-            info.get("score"),
-            media_id
-        ))
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        create_media_table(cursor)
+        for file in csv_files:
+            import_csv(cursor, file)
+        remove_duplicates(cursor)
         conn.commit()
-        time.sleep(0.5)  # avoid hitting rate limits
 
-print("🎉 AniList API update completed!")
+    print(f"🎉 Database '{db_path}' created/updated successfully from CSVs!")
 
-conn.close()
-print(f"🎉 Database '{db_filename}' created, duplicates removed, and missing info updated!")
+if __name__ == "__main__":
+    main()
