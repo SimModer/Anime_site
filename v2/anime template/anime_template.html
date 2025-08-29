@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ka">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ title_english }} - MySite</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <header>
@@ -14,16 +14,15 @@
     </div>
   </header>
 
-  <div class="container">
-    <!-- Anime Info Section -->
+  <main class="container">
+    <!-- Anime Info -->
     <section class="anime-info-section">
       <div class="anime-info-wrapper">
         <div class="anime-image">
-          <img src="{{ image }}" alt="Anime Poster" />
+          <img src="{{ image }}" alt="Anime Poster">
           <div class="dropdown">
             <button class="dropdown-btn">
-              სიაში დამატება
-              <span class="dropdown-arrow">▼</span>
+              სიაში დამატება <span class="dropdown-arrow">▼</span>
             </button>
             <div class="dropdown-menu">
               <a href="#" data-status="watching">ვუყურებ</a>
@@ -33,7 +32,107 @@
             </div>
           </div>
         </div>
-        
+        <div class="anime-details">
+          <div class="title-container">
+            <h1 class="anime-title">{{ title_english }} ({{ title_japanese }})</h1>
+            <button class="edit-title-btn" title="სათაურის რედაქტირება">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="m18.5 2.5 a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4Z"/>
+              </svg>
+            </button>
+          </div>
+          <ul class="anime-meta">
+            <li><strong>წელი:</strong> {{ seasonYear }}</li>
+            <li><strong>ჟანრი:</strong> {{ genres | join(', ') }}</li>
+            <li><strong>სტატუსი:</strong> {{ status or 'უცნობია' }}</li>
+            <li><strong>სტუდია:</strong> {{ studios or 'უცნობია' }}</li>
+            <li><strong>ხანგრძლივობა:</strong> {{ duration or 'უცნობია' }}</li>
+            <li><strong>რეიტინგი:</strong> {{ rating or 'N/A' }}</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Authors & Characters -->
+    <section class="authors-characters-section">
+      <div class="section-row">
+        <div class="authors-section">
+          <h3>ავტორები</h3>
+          <div class="person-list">
+            <div class="person-item">
+              <img src="https://via.placeholder.com/60x80/333/fff?text=Author" alt="Author" class="person-image">
+              <div class="person-info">
+                <div class="person-name">{{ author_name or 'უცნობი ავტორი' }}</div>
+                <div class="person-role">მანგაკა</div>
+              </div>
+            </div>
+            <div class="person-item">
+              <img src="https://via.placeholder.com/60x80/333/fff?text=Dir" alt="Director" class="person-image">
+              <div class="person-info">
+                <div class="person-name">{{ director_name or 'უცნობი რეჟისორი' }}</div>
+                <div class="person-role">რეჟისორი</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="characters-section">
+          <h3>მთავარი პერსონაჟები</h3>
+          <div class="character-list">
+            <div class="character-item">
+              <img src="https://via.placeholder.com/60x80/444/fff?text=Char1" alt="Character" class="character-image">
+              <div class="character-info">
+                <div class="character-name">{{ main_character_1 or 'პერსონაჟი 1' }}</div>
+                <div class="character-role">მთავარი პერსონაჟი</div>
+              </div>
+            </div>
+            <div class="character-item">
+              <img src="https://via.placeholder.com/60x80/444/fff?text=Char2" alt="Character" class="character-image">
+              <div class="character-info">
+                <div class="character-name">{{ main_character_2 or 'პერსონაჟი 2' }}</div>
+                <div class="character-role">მთავარი პერსონაჟი</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Description -->
+    <section class="anime-description">
+      <div class="description-header">
+        <h2>აღწერა</h2>
+        <div class="language-toggle">
+          <button class="lang-btn active" data-lang="geo">GEO</button>
+          <button class="lang-btn" data-lang="eng">ENG</button>
+        </div>
+      </div>
+      <div class="description-content">
+        <p class="description-text geo-text">{{ description | safe }}</p>
+        <p class="description-text eng-text" style="display:none">{{ description_english | safe }}</p>
+      </div>
+    </section>
+
+    <!-- Comments -->
+    <section class="comments-section">
+      <div class="comments-header">
+        <h2>კომენტარები</h2>
+        <div class="comments-stats">
+          <span id="comments-count">0</span> კომენტარი
+        </div>
+      </div>
+      <div class="comment-form">
+        <textarea id="comment-input" placeholder="თქვენი კომენტარი..."></textarea>
+        <button id="submit-comment" class="submit-comment-btn">კომენტარის დამატება</button>
+      </div>
+      <div class="comments-list" id="comments-list"></div>
+    </section>
+  </main>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
         <div class="anime-details">
           <h1 class="anime-title">{{ title_english }} ({{ title_japanese }})</h1>
           <ul class="anime-meta">
