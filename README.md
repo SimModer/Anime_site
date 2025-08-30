@@ -39,7 +39,7 @@
 
 - **Database (DB)**  
   - შეიცავს ანიმეების ინფორმაციას.  
-  - CSV ფაილები ძირითადად აღებულია [Kaggle](https://www.kaggle.com/datasets)-დან.  
+  - CSV ფაილები აღებულია [Kaggle](https://www.kaggle.com/datasets)-დან.  
   - გამოყენებულია მოდიფიცირებული კოდი:  
     - [Anime parsing Shikimori](https://github.com/GRaf-NEET/Anime-parsing-Shikimori)  
     - [Anime Offline Database](https://github.com/manami-project/anime-offline-database) (anime-offline-database.json)
