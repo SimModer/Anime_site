@@ -49,4 +49,3 @@
   - გამოყენებულია მოდიფიცირებული კოდი:  
     - [Anime parsing Shikimori](https://github.com/GRaf-NEET/Anime-parsing-Shikimori)  
     - [Anime Offline Database](https://github.com/manami-project/anime-offline-database) (anime-offline-database.json)
-    - 
