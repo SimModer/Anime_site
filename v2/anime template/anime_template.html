@@ -129,31 +129,6 @@
       <div class="comments-list" id="comments-list"></div>
     </section>
   </main>
-
-  <script src="script.js" defer></script>
-</body>
-</html>
-        <div class="anime-details">
-          <h1 class="anime-title">{{ title_english }} ({{ title_japanese }})</h1>
-          <ul class="anime-meta">
-            <li><strong>წელი:</strong> {{ seasonYear }}</li>
-            <li><strong>ჟანრი:</strong> {{ genres | join(', ') }}</li>
-            <li><strong>სტატუსი:</strong> {{ status or 'უცნობია' }}</li>
-            <li><strong>სტუდია:</strong> {{ studios or 'უცნობია' }}</li>
-            <li><strong>ხანგრძლივობა:</strong> {{ duration or 'უცნობია' }}</li>
-            <li><strong>რეიტინგიი:</strong> {{ rating or 'N/A' }}</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- Description Section -->
-    <section class="anime-description">
-      <h2>აღწერა</h2>
-      <p>{{ description | safe }}</p>
-    </section>
-  </div>
-  
   <script src="script.js" defer></script>
 </body>
 </html>
