@@ -1,45 +1,48 @@
 # Anime_site
 
-ანიმე საიტის კონცეფციის Frontend პროექტი.
+**Anime_site** — საიტის კონცეფცია მსგავსი MyAnimeList, AniList, Shikimori-ის: საშუალებას გაძლევთ მოძებნოთ, დაათვალიეროთ და მართოთ ანიმეს კოლექციები.
 
 ---
 
-## ვერსია 1 (V1)
+## 🚀 ფუნქციონალი
 
-**სტრუქტურა**  
 - **Anime Template**  
-  - HTML, CSS, JS.  
-  - Template გვერდი, რომელიც იყენებს Database-დან მიღებული მონაცემებს.  
-  - Python script ავსებს Template-ს Anilist API-ს საშუალებით და ქმნის ცალკეულ HTML გვერდს.  
+  - აშენებულია HTML, CSS და JS-ზე.
 
-- **Main Page**  
-  - HTML, CSS, JS 
-  - მთავარ გვერდზე ანიმეს განრიგი მუშაობს Anilist API-ს საშუალებით.  
-
-- **Profile Template**  
-  - HTML, CSS, JS
----
-
-## ვერსია 2 (V2)
-
-**ფუნქციონალი**  
-- საიტის კონცეფციია მსგავსი MyAnimeList, AniList, Shikimori.
-
-**სტრუქტურა**  
-- **Anime Template**  
-  - HTML, CSS, JS.  
-
-- **Main Page**  
+- **მთავარი გვერდი**  
   - HTML, CSS, JS.
-  - აჩვენებს მიმდინარე ანიმეებს Anilist API-ს საშუალებით.
-  - "მიმდინარე ანიმეები" ღილაკის გამოყენებით შესაძლებელია მეტი ანიმეების შემდეგ გვერდზე ნახვა (იგივე API-ს საშუალებით).
+  - აჩვენებს მიმდინარე ანიმეებს [Anilist API](https://anilist.gitbook.io/api-graphql)-ს საშუალებით.
+  - "მიმდინარე ანიმეები" ღილაკი საშუალებას გაძლევთ გადახვიდეთ შემდეგ გვერდზე მეტი ანიმეების სანახავად (იგივე API-ს გამოყენებით).
 
 - **Profile Template**  
-  - HTML, CSS, JS.  
+  - HTML, CSS, JS.
 
-- **Database (DB)**  
-  - შეიცავს ანიმეების ინფორმაციას.  
-  - CSV ფაილები ძირითადად აღებულია [Kaggle](https://www.kaggle.com/datasets)-დან.  
-  - გამოყენებულია მოდიფიცირებული კოდი:  
-    - [Anime parsing Shikimori](https://github.com/GRaf-NEET/Anime-parsing-Shikimori)  
-    - [Anime Offline Database](https://github.com/manami-project/anime-offline-database) (anime-offline-database.json)
+- **მონაცემთა ბაზა (DB)**  
+  - შეიცავს ანიმეების ინფორმაციას.
+  - CSV ფაილები აღებულია ძირითადად [Kaggle](https://www.kaggle.com/datasets)-დან.
+  - გამოყენებულია მოდიფიცირებული კოდი:
+    - [Anime parsing Shikimori](https://github.com/GRaf-NEET/Anime-parsing-Shikimori)
+    - [Anime Offline Database](https://github.com/manami-project/anime-offline-database)
+
+---
+
+## 📁 პროექტის სტრუქტურა
+
+- `main/` — მთავარი გვერდი (მიმდინარე ანიმეების ჩვენება)
+- `anime-template/` — ანიმეს დეტალური გვერდის შაბლონი
+- `profile-template/` — მომხმარებლის პროფილის შაბლონი
+- `db/` — მონაცემთა ბაზის ფაილები  
+- `assets/` — სტილები, სურათები და სკრიპტები
+
+---
+
+## ⚡️ გამოყენებული ტექნოლოგიები
+
+- HTML, CSS, JavaScript
+- Anilist API
+- Kaggle datasets
+- დამატებითი სკრიპტები სხვა ანიმე ბაზებიდან
+
+---
+
+> **P.S. ⚠️ პროექტის კოდი შეიცავს AI-ის მიერ გენერირებულ კოდს!**
