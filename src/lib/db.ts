@@ -36,6 +36,7 @@ function toObjects(result: any[]): any[] {
   );
 }
 
+/** All ongoing anime — both pages use this, just with different limits */
 export async function getOngoingAnimes(limit = 20): Promise<MediaItem[]> {
   const db = await getDb();
   const result = db.exec(`
@@ -49,8 +50,17 @@ export async function getOngoingAnimes(limit = 20): Promise<MediaItem[]> {
   return toObjects(result) as MediaItem[];
 }
 
-export async function getAllOngoingAnimes(limit = 50): Promise<MediaItem[]> {
-  return getOngoingAnimes(limit);
+/** Ongoing page loads all for infinite scroll */
+export async function getAllOngoingAnimes(): Promise<MediaItem[]> {
+  const db = await getDb();
+  const result = db.exec(`
+    SELECT id, name, english_name, japanese_name, other_name,
+           type, status, studios, poster_url, genres, premiered, episodes
+    FROM media
+    WHERE type IN ('TV', 'MOVIE', 'OVA', 'ONA', 'SPECIAL', 'MUSIC')
+      AND LOWER(status) = 'ongoing'
+  `);
+  return toObjects(result) as MediaItem[];
 }
 
 export async function getItemById(id: number): Promise<MediaItem | null> {
