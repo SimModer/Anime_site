@@ -1,5 +1,4 @@
 ---
-// src/pages/index.astro
 import Layout from '../layouts/Layout.astro';
 import { getOngoingAnimes } from '../lib/db';
 
@@ -7,7 +6,7 @@ let animes = [];
 let fetchError = false;
 
 try {
-  animes = getOngoingAnimes(20);
+  animes = await getOngoingAnimes(20);
 } catch (err) {
   fetchError = true;
   console.error('DB error:', err);
@@ -22,18 +21,17 @@ try {
     </div>
   )}
 
-  <!-- მიმდინარე ანიმეები -->
   <section id="ongoing-panel">
     <a href="/ongoing" class="panel-title-btn">მიმდინარე ანიმეები →</a>
     <div class="anime-strip" id="anime-grid">
       {animes.map((item) => (
         <div class="anime-card" data-anime-id={item.id} data-title={(item.name || '').toLowerCase()}>
           {item.poster_url
-            ? <img src={item.poster_url} alt={`${item.name} Cover`} class="anime-poster" loading="lazy" />
+            ? <img src={item.poster_url} alt={`${item.english_name || item.name} Cover`} class="anime-poster" loading="lazy" />
             : <div class="no-poster">No Image</div>
           }
           <div class="anime-info">
-            <div class="anime-title">{item.english_title || item.name}</div>
+            <div class="anime-title">{item.english_name || item.name}</div>
             <div class="anime-meta">{item.studios || item.premiered || ''}</div>
           </div>
         </div>
@@ -41,7 +39,6 @@ try {
     </div>
   </section>
 
-  <!-- სიახლეები -->
   <section class="news-section">
     <h2 class="news-title">სიახლეები</h2>
   </section>
