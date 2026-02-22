@@ -45,6 +45,7 @@ export async function getOngoingAnimes(limit = 20): Promise<MediaItem[]> {
     FROM media
     WHERE type IN ('TV', 'MOVIE', 'OVA', 'ONA', 'SPECIAL', 'MUSIC')
       AND LOWER(status) = 'ongoing'
+      AND (genres IS NULL OR LOWER(genres) NOT LIKE '%hentai%')
     LIMIT ${limit}
   `);
   return toObjects(result) as MediaItem[];
@@ -59,6 +60,7 @@ export async function getAllOngoingAnimes(): Promise<MediaItem[]> {
     FROM media
     WHERE type IN ('TV', 'MOVIE', 'OVA', 'ONA', 'SPECIAL', 'MUSIC')
       AND LOWER(status) = 'ongoing'
+      AND (genres IS NULL OR LOWER(genres) NOT LIKE '%hentai%')
   `);
   return toObjects(result) as MediaItem[];
 }

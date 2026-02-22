@@ -139,37 +139,11 @@ main {
 /* Ongoing Animes */
 #ongoing-panel {
   background: transparent;
+  border: none;
   width: 100%;
 }
 
-.panel-title {
-  color: #ff3b3b;
-  font-weight: bold;
-  text-align: left;
-  font-size: 18px;
-  margin-bottom: 15px;
-}
-
-/* Horizontal strip */
-.anime-strip {
-  display: flex;
-  overflow-x: auto;
-  gap: 15px;
-  scroll-behavior: smooth;
-  padding-bottom: 10px;
-}
-
-.anime-strip::-webkit-scrollbar {
-  height: 8px;
-}
-.anime-strip::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-
 .anime-card {
-  flex: 0 0 auto;
-  width: 160px;
   cursor: pointer;
   transition: transform 0.3s ease;
 }
