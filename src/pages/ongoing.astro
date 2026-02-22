@@ -52,7 +52,8 @@ try {
 
 <Layout title="MySite — ყველა მიმდინარე ანიმე">
   <section id="ongoing-panel">
-    <h1 class="panel-title-btn" style="cursor:default;">მიმდინარე ანიმეები</h1>
+    <a href="/" class="panel-title-btn">← მთავარ გვერდზე დაბრუნება</a>
+    <h1 class="page-heading">მიმდინარე ანიმეები</h1>
 
     {fetchError && (
       <div class="error-message" style="display:block;">
@@ -81,6 +82,13 @@ try {
 </Layout>
 
 <style>
+  .page-heading {
+    color: #ff3b3b;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
   .anime-grid-full {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
