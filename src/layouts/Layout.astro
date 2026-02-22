@@ -1,0 +1,48 @@
+---
+// src/layouts/Layout.astro
+// Base layout shared across all pages
+interface Props {
+  title?: string;
+}
+
+const { title = 'MySite' } = Astro.props;
+---
+
+<html lang="ka">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <header>
+      <div class="header-container">
+        <a href="/" class="logo">MySite</a>
+        <nav class="main-nav" aria-label="Site navigation">
+          <div class="search-box">
+            <input type="text" id="search-input" placeholder="ძებნა..." aria-label="ძებნა ანიმე" />
+          </div>
+        </nav>
+        <div class="auth-buttons" role="group" aria-label="ავტორიზაცია">
+          <button type="button">რეგისტრაცია</button>
+          <button type="button">შესვლა</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="content-container">
+        <slot />
+      </div>
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+
+  .logo {
+    text-decoration: none;
+  }
+</style>
