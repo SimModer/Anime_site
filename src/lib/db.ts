@@ -1,11 +1,10 @@
 // src/lib/db.ts
-// Reads anime/manga/novel data from media.db
-// Place your file at: db/media.db
+// Reads from media.db using sql.js (pure JS — works on Vercel with no compilation)
+// Place your DB file at: db/media.db
 
-import Database from 'better-sqlite3';
-import path from 'node:path';
-
-const DB_PATH = path.resolve('./db/media.db');
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import initSqlJs from 'sql.js';
 
 export interface MediaItem {
   id: number;
@@ -22,95 +21,61 @@ export interface MediaItem {
   chapters: number | null;
 }
 
-let _db: ReturnType<typeof Database> | null = null;
+let _db: any = null;
 
-function getDb() {
-  if (!_db) {
-    _db = new Database(DB_PATH, { readonly: true });
-  }
+async function getDb() {
+  if (_db) return _db;
+
+  const SQL = await initSqlJs();
+  const fileBuffer = readFileSync(resolve('./db/media.db'));
+  _db = new SQL.Database(fileBuffer);
   return _db;
+}
+
+/** Converts sql.js query result to array of objects */
+function toObjects(result: any[]): any[] {
+  if (!result.length) return [];
+  const { columns, values } = result[0];
+  return values.map((row: any[]) =>
+    Object.fromEntries(columns.map((col: string, i: number) => [col, row[i]]))
+  );
 }
 
 // ─── ANIME ────────────────────────────────────────────────────────────────────
 
-/** Ongoing anime for the home page strip */
-export function getOngoingAnimes(limit = 20): MediaItem[] {
-  const db = getDb();
-  const stmt = db.prepare(`
+export async function getOngoingAnimes(limit = 20): Promise<MediaItem[]> {
+  const db = await getDb();
+  const result = db.exec(`
     SELECT id, name, english_title, type, status, studios, poster_url, genres, premiered, episodes
     FROM media
     WHERE type IN ('TV', 'MOVIE', 'OVA', 'ONA', 'SPECIAL', 'MUSIC')
-      AND (status = 'ongoing' OR status = 'ONGOING')
-    LIMIT ?
+      AND (LOWER(status) = 'ongoing')
+    LIMIT ${limit}
   `);
-  return stmt.all(limit) as MediaItem[];
+  return toObjects(result) as MediaItem[];
 }
 
-/** All ongoing anime for the /ongoing page */
-export function getAllOngoingAnimes(limit = 50): MediaItem[] {
+export async function getAllOngoingAnimes(limit = 50): Promise<MediaItem[]> {
   return getOngoingAnimes(limit);
-}
-
-// ─── MANGA ────────────────────────────────────────────────────────────────────
-
-/** Ongoing manga */
-export function getOngoingManga(limit = 20): MediaItem[] {
-  const db = getDb();
-  const stmt = db.prepare(`
-    SELECT id, name, english_title, type, status, studios, poster_url, genres, premiered, volumes, chapters
-    FROM media
-    WHERE type = 'manga'
-      AND (status = 'ongoing' OR status = 'ONGOING')
-    LIMIT ?
-  `);
-  return stmt.all(limit) as MediaItem[];
-}
-
-/** All manga (any status) */
-export function getAllManga(limit = 50): MediaItem[] {
-  const db = getDb();
-  const stmt = db.prepare(`
-    SELECT id, name, english_title, type, status, studios, poster_url, genres, premiered, volumes, chapters
-    FROM media
-    WHERE type = 'manga'
-    LIMIT ?
-  `);
-  return stmt.all(limit) as MediaItem[];
-}
-
-// ─── NOVELS ───────────────────────────────────────────────────────────────────
-
-/** Ongoing novels (light novels) */
-export function getOngoingNovels(limit = 20): MediaItem[] {
-  const db = getDb();
-  const stmt = db.prepare(`
-    SELECT id, name, english_title, type, status, studios, poster_url, genres, premiered, volumes, chapters
-    FROM media
-    WHERE type IN ('novel', 'light_novel', 'NOVEL')
-      AND (status = 'ongoing' OR status = 'ONGOING')
-    LIMIT ?
-  `);
-  return stmt.all(limit) as MediaItem[];
 }
 
 // ─── SHARED ───────────────────────────────────────────────────────────────────
 
-/** Get a single item by ID (for detail pages) */
-export function getItemById(id: number): MediaItem | null {
-  const db = getDb();
-  const stmt = db.prepare(`SELECT * FROM media WHERE id = ?`);
-  return (stmt.get(id) as MediaItem) ?? null;
+export async function getItemById(id: number): Promise<MediaItem | null> {
+  const db = await getDb();
+  const result = db.exec(`SELECT * FROM media WHERE id = ${id} LIMIT 1`);
+  const items = toObjects(result);
+  return items[0] ?? null;
 }
 
-/** Search across all types by name */
-export function searchMedia(term: string, limit = 30): MediaItem[] {
-  const db = getDb();
-  const stmt = db.prepare(`
+export async function searchMedia(term: string, limit = 30): Promise<MediaItem[]> {
+  const db = await getDb();
+  const safe = term.replace(/'/g, "''");
+  const result = db.exec(`
     SELECT id, name, english_title, type, status, studios, poster_url, genres
     FROM media
-    WHERE name LIKE ? OR english_title LIKE ?
-    LIMIT ?
+    WHERE name LIKE '%${safe}%' OR english_title LIKE '%${safe}%'
+    LIMIT ${limit}
   `);
-  const q = `%${term}%`;
-  return stmt.all(q, q, limit) as MediaItem[];
+  return toObjects(result) as MediaItem[];
 }
