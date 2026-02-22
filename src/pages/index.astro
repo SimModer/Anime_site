@@ -1,83 +1,43 @@
 ---
 // src/pages/index.astro
-// Home page — fetches ongoing animes from Anilist at build time (SSG)
-// and hydrates search on the client side.
 import Layout from '../layouts/Layout.astro';
-
-const ITEMS_PER_PAGE = 20;
-
-const query = `
-  query {
-    Page(perPage: ${ITEMS_PER_PAGE}) {
-      media(status: RELEASING, type: ANIME, sort: POPULARITY_DESC) {
-        id
-        title {
-          romaji
-          english
-        }
-        coverImage {
-          large
-          medium
-        }
-        studios(isMain: true) {
-          nodes {
-            name
-          }
-        }
-      }
-    }
-  }
-`;
+import { getOngoingAnimes } from '../lib/db';
 
 let animes = [];
 let fetchError = false;
 
 try {
-  const res = await fetch('https://graphql.anilist.co', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify({ query }),
-  });
-
-  if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-  const json = await res.json();
-  animes = json?.data?.Page?.media ?? [];
+  animes = getOngoingAnimes(20);
 } catch (err) {
   fetchError = true;
-  console.error('Anilist fetch error:', err);
+  console.error('DB error:', err);
 }
 ---
 
-<Layout title="MySite — მიმდინარე ანიმეები">
+<Layout title="MySite">
+
+  {fetchError && (
+    <div class="error-message" style="display:block;">
+      დაფიქსირდა შეცდომა მონაცემთა ბაზის წაკითხვისას.
+    </div>
+  )}
+
   <!-- მიმდინარე ანიმეები -->
   <section id="ongoing-panel">
     <a href="/ongoing" class="panel-title-btn">მიმდინარე ანიმეები →</a>
-
-    {fetchError && (
-      <div class="error-message" style="display:block;">
-        დაფიქსირდა შეცდომა. სცადეთ მოგვიანებით.
-      </div>
-    )}
-
     <div class="anime-strip" id="anime-grid">
-      {animes.map((anime) => {
-        const title = anime.title?.romaji || anime.title?.english || 'უსახელო';
-        const cover = anime.coverImage?.large || anime.coverImage?.medium || '';
-        const studio = anime.studios?.nodes?.[0]?.name || 'სტუდია უცნობია';
-
-        return (
-          <div class="anime-card" data-anime-id={anime.id} data-title={title.toLowerCase()}>
-            <img src={cover} alt={`${title} Cover`} class="anime-poster" loading="lazy" />
-            <div class="anime-info">
-              <div class="anime-title">{title}</div>
-              <div class="anime-meta">{studio}</div>
-            </div>
+      {animes.map((item) => (
+        <div class="anime-card" data-anime-id={item.id} data-title={(item.name || '').toLowerCase()}>
+          {item.poster_url
+            ? <img src={item.poster_url} alt={`${item.name} Cover`} class="anime-poster" loading="lazy" />
+            : <div class="no-poster">No Image</div>
+          }
+          <div class="anime-info">
+            <div class="anime-title">{item.english_title || item.name}</div>
+            <div class="anime-meta">{item.studios || item.premiered || ''}</div>
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   </section>
 
@@ -85,23 +45,37 @@ try {
   <section class="news-section">
     <h2 class="news-title">სიახლეები</h2>
   </section>
+
 </Layout>
 
-<!-- Client-side search (runs in browser only) -->
-<script>
-  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+<style>
+  .no-poster {
+    width: 100%;
+    height: 230px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #8a9ba8;
+    font-size: 12px;
+  }
+</style>
 
-  function debounce(fn: (...args: any[]) => void, delay: number) {
-    let timer: ReturnType<typeof setTimeout>;
-    return (...args: any[]) => {
+<script>
+  const searchInput = document.getElementById('search-input');
+
+  function debounce(fn, delay) {
+    let timer;
+    return (...args) => {
       clearTimeout(timer);
       timer = setTimeout(() => fn(...args), delay);
     };
   }
 
-  function handleSearch(e: Event) {
-    const term = (e.target as HTMLInputElement).value.toLowerCase().trim();
-    document.querySelectorAll<HTMLElement>('.anime-card').forEach(card => {
+  function handleSearch(e) {
+    const term = e.target.value.toLowerCase().trim();
+    document.querySelectorAll('.anime-card').forEach(card => {
       const title = card.dataset.title || '';
       card.style.display = !term || title.includes(term) ? '' : 'none';
     });

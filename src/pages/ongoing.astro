@@ -1,52 +1,17 @@
 ---
 // src/pages/ongoing.astro
-// Full ongoing animes page
+// Full ongoing animes page — loads from SQLite database at build time.
 import Layout from '../layouts/Layout.astro';
-
-const ITEMS_PER_PAGE = 50;
-
-const query = `
-  query {
-    Page(perPage: ${ITEMS_PER_PAGE}) {
-      media(status: RELEASING, type: ANIME, sort: POPULARITY_DESC) {
-        id
-        title {
-          romaji
-          english
-        }
-        coverImage {
-          large
-          medium
-        }
-        studios(isMain: true) {
-          nodes {
-            name
-          }
-        }
-      }
-    }
-  }
-`;
+import { getAllOngoingAnimes } from '../lib/db';
 
 let animes = [];
 let fetchError = false;
 
 try {
-  const res = await fetch('https://graphql.anilist.co', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    },
-    body: JSON.stringify({ query }),
-  });
-
-  if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-  const json = await res.json();
-  animes = json?.data?.Page?.media ?? [];
+  animes = getAllOngoingAnimes(50);
 } catch (err) {
   fetchError = true;
-  console.error('Anilist fetch error:', err);
+  console.error('DB error:', err);
 }
 ---
 
@@ -57,26 +22,20 @@ try {
 
     {fetchError && (
       <div class="error-message" style="display:block;">
-        დაფიქსირდა შეცდომა. სცადეთ მოგვიანებით.
+        დაფიქსირდა შეცდომა მონაცემთა ბაზის წაკითხვისას.
       </div>
     )}
 
     <div class="anime-grid-full" id="anime-grid">
-      {animes.map((anime) => {
-        const title = anime.title?.romaji || anime.title?.english || 'უსახელო';
-        const cover = anime.coverImage?.large || anime.coverImage?.medium || '';
-        const studio = anime.studios?.nodes?.[0]?.name || 'სტუდია უცნობია';
-
-        return (
-          <div class="anime-card" data-anime-id={anime.id} data-title={title.toLowerCase()}>
-            <img src={cover} alt={`${title} Cover`} class="anime-poster" loading="lazy" />
-            <div class="anime-info">
-              <div class="anime-title">{title}</div>
-              <div class="anime-meta">{studio}</div>
-            </div>
+      {animes.map((anime) => (
+        <div class="anime-card" data-anime-id={anime.id} data-title={anime.title.toLowerCase()}>
+          <img src={anime.cover} alt={`${anime.title} Cover`} class="anime-poster" loading="lazy" />
+          <div class="anime-info">
+            <div class="anime-title">{anime.title}</div>
+            <div class="anime-meta">{anime.studio}</div>
           </div>
-        );
-      })}
+        </div>
+      ))}
     </div>
   </section>
 </Layout>
@@ -98,19 +57,19 @@ try {
 </style>
 
 <script>
-  const searchInput = document.getElementById('search-input') as HTMLInputElement;
+  const searchInput = document.getElementById('search-input');
 
-  function debounce(fn: (...args: any[]) => void, delay: number) {
-    let timer: ReturnType<typeof setTimeout>;
-    return (...args: any[]) => {
+  function debounce(fn, delay) {
+    let timer;
+    return (...args) => {
       clearTimeout(timer);
       timer = setTimeout(() => fn(...args), delay);
     };
   }
 
-  function handleSearch(e: Event) {
-    const term = (e.target as HTMLInputElement).value.toLowerCase().trim();
-    document.querySelectorAll<HTMLElement>('.anime-card').forEach(card => {
+  function handleSearch(e) {
+    const term = e.target.value.toLowerCase().trim();
+    document.querySelectorAll('.anime-card').forEach(card => {
       const title = card.dataset.title || '';
       card.style.display = !term || title.includes(term) ? '' : 'none';
     });
