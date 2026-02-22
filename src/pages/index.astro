@@ -6,7 +6,7 @@ let animes = [];
 let fetchError = false;
 
 try {
-  animes = await getOngoingAnimes(100);
+  animes = await getOngoingAnimes(8);
 } catch (err) {
   fetchError = true;
   console.error('DB error:', err);
@@ -72,25 +72,3 @@ try {
     font-size: 12px;
   }
 </style>
-
-<script>
-  const searchInput = document.getElementById('search-input');
-
-  function debounce(fn, delay) {
-    let timer;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn(...args), delay);
-    };
-  }
-
-  function handleSearch(e) {
-    const term = e.target.value.toLowerCase().trim();
-    document.querySelectorAll('.anime-card').forEach(card => {
-      const title = card.dataset.title || '';
-      card.style.display = !term || title.includes(term) ? '' : 'none';
-    });
-  }
-
-  searchInput?.addEventListener('input', debounce(handleSearch, 300));
-</script>
