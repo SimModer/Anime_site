@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">რედაქტირება - MySite</title>
+  <link rel="stylesheet" href="edit_styles.css">
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <a href="anime_template.html" class="logo">MySite</a>
+    </div>
+  </header>
+
+  <div class="edit-page-wrapper">
+
+    <div class="error-banner" id="error-banner">⚠ მონაცემების ჩატვირთვა ვერ მოხერხდა.</div>
+
+    <!-- Breadcrumb -->
+    <div class="edit-breadcrumb">
+      <a href="#">ანიმე</a><span class="sep">»</span>
+      <a href="#">სერიალები</a><span class="sep">»</span>
+      <a href="anime_template.html" id="bc-name">—</a><span class="sep">»</span>
+      <span>რედაქტირება</span>
+    </div>
+
+    <div class="edit-page-title" id="edit-title">რედაქტირება</div>
+    <div class="edit-page-subtitle">ყველა ცვლილება ლოგირდება და შემოწმდება</div>
+
+    <!-- ── სახელები ── -->
+    <div class="edit-section">
+      <div class="edit-section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
+        <h3>სახელები</h3>
+      </div>
+      <div class="field-row">
+        <div class="field-label">ინგლისური სახელი <span class="mod-badge">MODER</span></div>
+        <div class="field-control"><input class="edit-input" type="text" id="f-title-en" placeholder="ინგლისური სათაური..."></div>
+        <div class="field-action"><button class="field-save-btn mod-btn" disabled>მოდერატორი</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">ქართული სახელი</div>
+        <div class="field-control"><input class="edit-input" type="text" id="f-title-ka" placeholder="ქართული სათაური..."></div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-title-ka')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">სხვა სახელები</div>
+        <div class="field-control">
+          <input class="edit-input" type="text" id="f-title-other" placeholder="გამოყოფილი მძიმეებით...">
+          <span class="field-hint">დამატებითი სახელები, გამოყოფილი მძიმეებით</span>
+        </div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-title-other')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">იაპონური სახელი</div>
+        <div class="field-control"><input class="edit-input" type="text" id="f-title-jp" placeholder="日本語タイトル..."></div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-title-jp')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">ფრანჩაიზი</div>
+        <div class="field-control"><input class="edit-input" type="text" id="f-franchise" placeholder="ფრანჩაიზის სახელი..."></div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-franchise')">შენახვა</button></div>
+      </div>
+    </div>
+
+    <!-- ── ძირითადი ინფო ── -->
+    <div class="edit-section">
+      <div class="edit-section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <h3>ძირითადი ინფო</h3>
+      </div>
+      <div class="field-row">
+        <div class="field-label">ტიპი</div>
+        <div class="field-control">
+          <select class="edit-select" id="f-type">
+            <option value="">— აირჩიეთ —</option>
+            <option>TV სერიალი</option><option>ფილმი</option><option>OVA</option><option>ONA</option><option>Special</option>
+          </select>
+        </div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-type')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">რეიტინგი</div>
+        <div class="field-control">
+          <select class="edit-select" id="f-rating">
+            <option value="">— აირჩიეთ —</option>
+            <option>G</option><option>PG</option><option>PG-13</option><option>R-17</option><option>R+</option>
+          </select>
+        </div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-rating')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">პირველწყარო</div>
+        <div class="field-control">
+          <select class="edit-select" id="f-source">
+            <option value="">— აირჩიეთ —</option>
+            <option>მანგა</option><option>Light Novel</option><option>ორიგინალი</option>
+            <option>Visual Novel</option><option>თამაში</option><option>რომანი</option>
+          </select>
+        </div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-source')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">სტატუსი</div>
+        <div class="field-control">
+          <select class="edit-select" id="f-status">
+            <option value="">— აირჩიეთ —</option>
+            <option>Ongoing (გამოდის)</option>
+            <option>Finished (დასრულებული)</option>
+            <option>Not Yet Aired (ჯერ არ გამოვიდა)</option>
+          </select>
+        </div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-status')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">სტუდია</div>
+        <div class="field-control"><input class="edit-input" type="text" id="f-studio" placeholder="სტუდიის სახელი..."></div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-studio')">შენახვა</button></div>
+      </div>
+    </div>
+
+    <!-- ── ჟანრები ── -->
+    <div class="edit-section">
+      <div class="edit-section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        <h3>ჟანრები <span class="mod-badge">MODER</span></h3>
+      </div>
+      <div style="padding:20px 24px;display:flex;flex-direction:column;gap:16px;">
+        <div class="genres-grid" id="genres-grid"></div>
+        <div style="display:flex;justify-content:flex-end;">
+          <button class="field-save-btn mod-btn" disabled>მხოლოდ მოდერატორებისთვის</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ეპიზოდები & დრო ── -->
+    <div class="edit-section">
+      <div class="edit-section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <h3>ეპიზოდები & დრო</h3>
+      </div>
+      <div class="field-row">
+        <div class="field-label">ეპიზოდების რაოდენობა</div>
+        <div class="field-control"><input class="edit-input" type="number" id="f-episodes" placeholder="0" min="1"></div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-episodes')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">ხანგრძლივობა</div>
+        <div class="field-control"><input class="edit-input" type="text" id="f-duration" placeholder="მაგ: 24 min."></div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-duration')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">გამოშვების თარიღი</div>
+        <div class="field-control">
+          <div class="dates-row">
+            <div class="date-group"><label>დასაწყისი</label><input class="edit-input" type="date" id="f-aired-from"></div>
+            <div class="date-group"><label>დასასრული</label><input class="edit-input" type="date" id="f-aired-to"></div>
+          </div>
+        </div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-aired-from')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">სეზონი</div>
+        <div class="field-control">
+          <div class="dates-row">
+            <div class="date-group">
+              <label>სეზონი</label>
+              <select class="edit-select" id="f-season">
+                <option value="">— —</option>
+                <option>Winter</option><option>Spring</option><option>Summer</option><option>Fall</option>
+              </select>
+            </div>
+            <div class="date-group"><label>წელი</label><input class="edit-input" type="number" id="f-season-year" placeholder="2026"></div>
+          </div>
+        </div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-season')">შენახვა</button></div>
+      </div>
+    </div>
+
+    <!-- ── პოსტერი & აღწერა ── -->
+    <div class="edit-section">
+      <div class="edit-section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+        <h3>პოსტერი & აღწერა</h3>
+      </div>
+      <div class="field-row">
+        <div class="field-label">პოსტერი <span class="mod-badge">MODER</span></div>
+        <div class="field-control">
+          <div class="image-preview-wrapper">
+            <div class="image-preview-box" id="img-box">სურათი<br>არ არის</div>
+            <div class="image-url-group">
+              <input class="edit-input" type="url" id="f-img-url" placeholder="https://... სურათის URL" oninput="previewImg(this.value)">
+              <span class="field-hint">სრული URL სურათის ლინკი</span>
+            </div>
+          </div>
+        </div>
+        <div class="field-action"><button class="field-save-btn mod-btn" disabled>მოდერატორი</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">აღწერა (ქართული)</div>
+        <div class="field-control">
+          <textarea class="edit-textarea" id="f-desc-ka" placeholder="ქართული აღწერა..."></textarea>
+          <span class="field-hint">HTML ტეგები დასაშვებია: &lt;b&gt;, &lt;i&gt;, &lt;br&gt;</span>
+        </div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-desc-ka')">შენახვა</button></div>
+      </div>
+      <div class="field-row">
+        <div class="field-label">აღწერა (ინგლისური)</div>
+        <div class="field-control">
+          <textarea class="edit-textarea" id="f-desc-en" placeholder="English description..."></textarea>
+        </div>
+        <div class="field-action"><button class="field-save-btn" onclick="save('f-desc-en')">შენახვა</button></div>
+      </div>
+    </div>
+
+    <!-- ── ისტორია ── -->
+    <div class="edit-section">
+      <div class="edit-section-header">
+        <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/></svg>
+        <h3>რედაქტირების ისტორია</h3>
+      </div>
+      <div id="history-list"><div class="empty-history">ისტორია ცარიელია.</div></div>
+    </div>
+
+  </div>
+
+  <!-- Sticky bar -->
+  <div class="edit-action-bar">
+    <div class="action-bar-info">შეუნახავი ცვლილებები: <span id="unsaved-count">0</span></div>
+    <div class="action-bar-btns">
+      <a href="anime_template.html" class="btn-cancel">გაუქმება</a>
+      <button class="btn-save-all" onclick="saveAll()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17,21 17,13 7,13 7,21"/><polyline points="7,3 7,8 15,8"/></svg>
+        ყველაფრის შენახვა
+      </button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast success" id="toast">
+    <span>✓</span><span id="toast-msg">შენახულია!</span>
+  </div>
+</body>
+<script src="script.js" defer></script>
+</html>
