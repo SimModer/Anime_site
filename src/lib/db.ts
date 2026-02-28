@@ -87,3 +87,10 @@ export async function searchMedia(term: string, limit = 30): Promise<MediaItem[]
   `);
   return toObjects(result) as MediaItem[];
 }
+
+export async function getAnimeById(id: number): Promise<any | null> {
+  const db = await getDb();
+  const result = db.exec(`SELECT * FROM media WHERE id = ${id} LIMIT 1`);
+  const items = toObjects(result);
+  return items[0] ?? null;
+}

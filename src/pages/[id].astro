@@ -1,0 +1,332 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getAnimeById } from '../../lib/db';
+
+const { id } = Astro.params;
+let anime = null;
+let fetchError = false;
+
+try {
+  anime = await getAnimeById(Number(id));
+} catch (err) {
+  fetchError = true;
+  console.error('DB error:', err);
+}
+
+const title = anime?.english_name || anime?.name || 'MySite';
+const genres = anime?.genres ? anime.genres.split(',').map((g: string) => g.trim()) : [];
+---
+
+<html lang="ka">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title} - MySite</title>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <a href="/" class="logo">MySite</a>
+    </div>
+  </header>
+
+  <main class="container">
+
+    {(fetchError || !anime) && (
+      <div class="error-banner show">⚠ მონაცემების ჩატვირთვა ვერ მოხერხდა.</div>
+    )}
+
+    {anime && (
+      <div class="main-content">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <div class="anime-poster">
+            {anime.poster_url
+              ? <img src={anime.poster_url} alt="Poster" class="poster-image" />
+              : <div class="poster-placeholder">სურათი არ არის</div>
+            }
+          </div>
+
+          <div class="user-actions">
+            <div class="rating-section">
+              <h4 style="color:var(--primary);margin-bottom:15px;">შეფასება</h4>
+              <div class="score-display">
+                <span class="score-value" id="score-val">0</span>
+                <span class="score-max">/ 10</span>
+              </div>
+              <div class="stars" id="rating-stars">
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+                <span class="star">★</span>
+              </div>
+            </div>
+            <div class="status-dropdown">
+              <div class="dropdown">
+                <button class="dropdown-btn" id="dd-btn">სიაში დამატება <span>▼</span></button>
+                <div class="dropdown-menu" id="dd-menu">
+                  <a href="#" data-s="watching">ვუყურებ</a>
+                  <a href="#" data-s="plan">ვაპირებ ყურებას</a>
+                  <a href="#" data-s="completed">დასრულებული</a>
+                  <a href="#" data-s="dropped">მივატოვე</a>
+                  <a href="#" data-s="hold">შეჩერებული</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Content -->
+        <div class="content-area">
+
+          <section class="anime-header">
+            <div class="title-section">
+              <h1 class="anime-title">{anime.english_name || anime.name}</h1>
+              {anime.japanese_name && <div class="title-alternative">{anime.japanese_name}</div>}
+              {anime.name && anime.english_name && <div class="title-alternative">{anime.name}</div>}
+            </div>
+
+            <div class="anime-meta-grid">
+              <div class="meta-item"><span class="meta-label">ტიპი:</span><span class="meta-value">{anime.type || '—'}</span></div>
+              <div class="meta-item"><span class="meta-label">ეპიზოდები:</span><span class="meta-value">{anime.episodes || '—'}</span></div>
+              <div class="meta-item"><span class="meta-label">სტატუსი:</span><span class="meta-value">{anime.status || '—'}</span></div>
+              <div class="meta-item"><span class="meta-label">გამოშვება:</span><span class="meta-value">{anime.aired_on || '—'}</span></div>
+              <div class="meta-item"><span class="meta-label">სეზონი:</span><span class="meta-value">{anime.premiered || '—'}</span></div>
+              <div class="meta-item"><span class="meta-label">სტუდია:</span><span class="meta-value">{anime.studios || '—'}</span></div>
+              <div class="meta-item"><span class="meta-label">წყარო:</span><span class="meta-value">{anime.source || '—'}</span></div>
+              <div class="meta-item"><span class="meta-label">ჟანრები:</span><span class="meta-value">{genres.join(', ') || '—'}</span></div>
+              <div class="meta-item"><span class="meta-label">ხანგრძლივობა:</span><span class="meta-value">{anime.duration || '—'}</span></div>
+              <div class="meta-item"><span class="meta-label">რეიტინგი:</span><span class="meta-value">{anime.rating || '—'}</span></div>
+            </div>
+          </section>
+
+          <section class="content-tabs">
+            <nav class="tab-nav">
+              <button class="tab-btn active" data-tab="description">აღწერა</button>
+              <button class="tab-btn" data-tab="characters">პერსონაჟები</button>
+              <button class="tab-btn" data-tab="staff">გუნდი</button>
+            </nav>
+
+            <div class="tab-content active" id="description-tab">
+              <div class="description-header">
+                <h3 style="color:var(--primary);">აღწერა</h3>
+                <div class="language-toggle">
+                  <button class="lang-btn active" data-lang="geo">GEO</button>
+                  <button class="lang-btn" data-lang="eng">ENG</button>
+                </div>
+              </div>
+              <p class="description-text geo-text" id="desc-geo">
+                {anime.synopsis || <span class="empty-text">აღწერა არ არის.</span>}
+              </p>
+              <p class="description-text eng-text" id="desc-eng" style="display:none">
+                <span class="empty-text">No description available.</span>
+              </p>
+            </div>
+
+            <div class="tab-content" id="characters-tab">
+              <h3 style="color:var(--primary);margin-bottom:25px;">პერსონაჟები</h3>
+              <div class="characters-grid" id="characters-grid">
+                <p class="empty-text">პერსონაჟები არ არის.</p>
+              </div>
+            </div>
+
+            <div class="tab-content" id="staff-tab">
+              <h3 style="color:var(--primary);margin-bottom:25px;">სტაფი</h3>
+              <div class="staff-grid" id="staff-grid">
+                <p class="empty-text">სტაფი არ არის.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="comments-section">
+            <div class="comments-header">
+              <h2>კომენტარები</h2>
+              <span class="comments-stats" id="comment-count">0 კომენტარი</span>
+            </div>
+            <div class="comment-form">
+              <textarea id="comment-input" placeholder="დაწერეთ თქვენი კომენტარი... (Ctrl+Enter გასაგზავნად)"></textarea>
+              <button class="submit-comment-btn" id="submit-comment">კომენტარის გაგზავნა</button>
+            </div>
+            <div class="comments-list" id="comments-list"></div>
+          </section>
+
+        </div>
+      </div>
+    )}
+  </main>
+</body>
+</html>
+
+<style is:global>
+  @import '../../styles/global.css';
+
+  :root {
+    --primary:#4ecdc4; --primary-alt:#45b7d1; --accent:#ff6b6b;
+    --bg-gradient:linear-gradient(135deg,#1a1a2e,#16213e);
+    --glass-bg:rgba(0,0,0,0.3); --glass-bg-light:rgba(0,0,0,0.4);
+    --glass-border:rgba(78,205,196,0.2); --text-muted:#8a9ba8; --text-light:#fff;
+    --white-soft:rgba(255,255,255,0.05); --white-hover:rgba(255,255,255,0.08);
+    --transition:all 0.3s ease; --radius-md:15px; --radius-sm:10px;
+  }
+
+  body { background: var(--bg-gradient); color: var(--text-light); font-family: 'Segoe UI', sans-serif; min-height: 100vh; line-height: 1.6; }
+
+  .container { max-width:1400px; margin:0 auto; padding:40px 30px; }
+  .main-content { display:grid; grid-template-columns:300px 1fr; gap:30px; }
+
+  .sidebar { display:flex; flex-direction:column; gap:20px; }
+  .anime-poster { background:var(--glass-bg); border-radius:15px; padding:20px; border:1px solid var(--glass-border); }
+  .poster-image { width:100%; aspect-ratio:3/4; border-radius:var(--radius-md); object-fit:cover; box-shadow:0 10px 30px rgba(0,0,0,.3); }
+  .poster-placeholder { width:100%; aspect-ratio:3/4; border-radius:var(--radius-md); background:var(--glass-bg-light); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:13px; }
+
+  .user-actions { background:var(--glass-bg); border-radius:15px; padding:20px; border:1px solid var(--glass-border); }
+  .rating-section { margin-bottom:20px; }
+  .score-display { display:flex; align-items:center; gap:10px; margin-bottom:15px; }
+  .score-value { font-size:24px; font-weight:bold; color:var(--primary); }
+  .score-max { color:var(--text-muted); }
+  .stars { display:flex; gap:5px; }
+  .star { color:var(--text-muted); cursor:pointer; transition:var(--transition); font-size:20px; }
+  .star.active { color:#ffd700; }
+
+  .dropdown { position:relative; width:100%; }
+  .dropdown-btn { background:linear-gradient(45deg,var(--primary),var(--primary-alt)); color:var(--text-light); padding:12px 16px; border:none; border-radius:var(--radius-sm); width:100%; cursor:pointer; font-size:14px; font-weight:bold; transition:var(--transition); display:flex; justify-content:space-between; align-items:center; }
+  .dropdown-menu { display:none; position:absolute; top:105%; left:0; width:100%; background:var(--glass-bg); backdrop-filter:blur(10px); border-radius:var(--radius-sm); border:1px solid var(--glass-border); z-index:10; overflow:hidden; }
+  .dropdown-menu.show { display:block; }
+  .dropdown-menu a { display:block; padding:12px 16px; text-decoration:none; color:var(--text-light); transition:var(--transition); border-bottom:1px solid var(--glass-border); }
+  .dropdown-menu a:last-child { border-bottom:none; }
+  .dropdown-menu a:hover { background:var(--white-hover); color:var(--primary); }
+
+  .content-area { display:flex; flex-direction:column; gap:25px; }
+  .anime-header { background:var(--glass-bg); border-radius:20px; padding:30px; border:1px solid var(--glass-border); }
+  .anime-title { font-size:32px; font-weight:bold; color:var(--primary); margin-bottom:8px; }
+  .title-alternative { font-size:18px; color:var(--text-muted); margin-bottom:5px; }
+
+  .anime-meta-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:15px; margin-top:20px; }
+  .meta-item { background:var(--white-soft); padding:12px 16px; border-radius:var(--radius-sm); border-left:4px solid var(--primary); }
+  .meta-label { color:var(--primary); font-weight:bold; margin-right:8px; }
+  .meta-value { color:var(--text-muted); }
+
+  .content-tabs { background:var(--glass-bg); border-radius:20px; border:1px solid var(--glass-border); overflow:hidden; }
+  .tab-nav { display:flex; background:var(--glass-bg-light); border-bottom:1px solid var(--glass-border); }
+  .tab-btn { padding:15px 25px; background:none; border:none; color:var(--text-muted); cursor:pointer; transition:var(--transition); font-size:16px; font-weight:500; flex:1; }
+  .tab-btn.active { background:var(--primary); color:var(--text-light); }
+  .tab-btn:hover:not(.active) { background:var(--white-hover); color:var(--text-light); }
+  .tab-content { padding:30px; display:none; }
+  .tab-content.active { display:block; }
+
+  .description-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+  .language-toggle { display:flex; gap:5px; background:var(--glass-bg-light); border-radius:var(--radius-sm); padding:5px; border:1px solid var(--glass-border); }
+  .lang-btn { padding:8px 16px; border:none; background:transparent; color:var(--text-muted); border-radius:var(--radius-sm); cursor:pointer; font-size:14px; font-weight:bold; transition:var(--transition); }
+  .lang-btn.active { background:var(--primary); color:var(--text-light); }
+  .description-text { font-size:16px; line-height:1.8; color:var(--text-light); }
+  .empty-text { color:var(--text-muted); font-style:italic; font-size:14px; }
+
+  .characters-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+  .character-card,.staff-card { background:var(--white-soft); border-radius:var(--radius-md); padding:20px; transition:var(--transition); border:1px solid var(--glass-border); }
+  .character-card:hover,.staff-card:hover { background:var(--white-hover); transform:translateY(-5px); }
+  .character-main,.staff-main { display:flex; gap:15px; align-items:center; }
+  .character-image,.staff-image { width:60px; height:80px; border-radius:var(--radius-sm); object-fit:cover; border:2px solid var(--glass-border); background:var(--glass-bg-light); }
+  .character-name,.staff-name { font-weight:bold; color:var(--text-light); font-size:16px; margin-bottom:5px; }
+  .character-role,.staff-role { color:var(--text-muted); font-size:14px; }
+  .staff-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+
+  .comments-section { background:var(--glass-bg); border-radius:20px; padding:30px; border:1px solid var(--glass-border); }
+  .comments-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:25px; border-bottom:2px solid var(--glass-border); padding-bottom:15px; }
+  .comments-header h2 { font-size:24px; color:var(--primary); }
+  .comments-stats { color:var(--text-muted); }
+  .comment-form { margin-bottom:30px; }
+  #comment-input { width:100%; min-height:100px; background:var(--glass-bg-light); border:1px solid var(--glass-border); border-radius:var(--radius-sm); padding:15px; color:var(--text-light); font-family:inherit; font-size:14px; resize:vertical; transition:var(--transition); }
+  #comment-input:focus { outline:none; border-color:var(--primary); }
+  #comment-input::placeholder { color:var(--text-muted); }
+  .submit-comment-btn { background:linear-gradient(45deg,var(--primary),var(--primary-alt)); color:var(--text-light); padding:12px 24px; border:none; border-radius:var(--radius-sm); cursor:pointer; font-weight:bold; transition:var(--transition); margin-top:15px; }
+  .submit-comment-btn:hover { transform:translateY(-2px); box-shadow:0 5px 15px rgba(78,205,196,.4); }
+  .comments-list { display:flex; flex-direction:column; gap:20px; }
+  .comment-item { display:flex; gap:15px; background:var(--white-soft); padding:20px; border-radius:var(--radius-md); }
+  .comment-item:hover { background:var(--white-hover); }
+  .comment-header { display:flex; align-items:center; gap:15px; margin-bottom:10px; }
+  .comment-author { font-weight:bold; color:var(--primary); }
+  .comment-date { color:var(--text-muted); font-size:12px; }
+  .comment-text { color:var(--text-light); line-height:1.6; }
+
+  .error-banner { background:rgba(255,107,107,0.1); border:1px solid rgba(255,107,107,0.3); border-radius:var(--radius-sm); padding:16px 20px; color:var(--accent); display:none; margin-bottom:20px; }
+  .error-banner.show { display:block; }
+
+  @media(max-width:1024px) { .main-content { grid-template-columns:1fr; } }
+  @media(max-width:768px) { .container { padding:20px; } .anime-meta-grid { grid-template-columns:1fr; } .anime-title { font-size:24px; } }
+</style>
+
+<script>
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab + '-tab').classList.add('active');
+    });
+  });
+
+  // Language toggle
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('desc-geo').style.display = btn.dataset.lang === 'geo' ? 'block' : 'none';
+      document.getElementById('desc-eng').style.display = btn.dataset.lang === 'eng' ? 'block' : 'none';
+    });
+  });
+
+  // Stars
+  const stars = document.querySelectorAll('.star');
+  const scoreVal = document.getElementById('score-val');
+  let rating = 0;
+  stars.forEach((s, i) => {
+    s.addEventListener('click', () => { rating = i + 1; updateStars(); scoreVal.textContent = String(rating * 2); });
+    s.addEventListener('mouseenter', () => stars.forEach((x, j) => x.classList.toggle('active', j <= i)));
+  });
+  document.getElementById('rating-stars')?.addEventListener('mouseleave', updateStars);
+  function updateStars() { stars.forEach((s, i) => s.classList.toggle('active', i < rating)); }
+
+  // Dropdown
+  document.getElementById('dd-btn')?.addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('dd-menu').classList.toggle('show');
+  });
+  document.addEventListener('click', () => document.getElementById('dd-menu')?.classList.remove('show'));
+  document.querySelectorAll('#dd-menu a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.getElementById('dd-btn').innerHTML = (e.target as HTMLElement).textContent + ' <span>▼</span>';
+      document.getElementById('dd-menu').classList.remove('show');
+    });
+  });
+
+  // Comments
+  let commentCount = 0;
+  function postComment() {
+    const inp = document.getElementById('comment-input') as HTMLTextAreaElement;
+    const text = inp.value.trim();
+    if (!text) return;
+    commentCount++;
+    document.getElementById('comment-count').textContent = commentCount + ' კომენტარი';
+    const div = document.createElement('div');
+    div.className = 'comment-item';
+    div.style.cssText = 'opacity:0;transform:translateY(-14px);';
+    div.innerHTML = `
+      <div class="comment-content">
+        <div class="comment-header">
+          <span class="comment-author">თქვენ</span>
+          <span class="comment-date">ახლა</span>
+        </div>
+        <div class="comment-text">${text.replace(/</g, '&lt;')}</div>
+      </div>`;
+    const list = document.getElementById('comments-list');
+    list.insertBefore(div, list.firstChild);
+    inp.value = '';
+    requestAnimationFrame(() => { div.style.transition = 'all 0.35s ease'; div.style.opacity = '1'; div.style.transform = 'translateY(0)'; });
+  }
+  document.getElementById('submit-comment')?.addEventListener('click', postComment);
+  document.getElementById('comment-input')?.addEventListener('keydown', (e: KeyboardEvent) => { if (e.key === 'Enter' && e.ctrlKey) postComment(); });
+</script>

@@ -73,15 +73,18 @@ const animesJson = JSON.stringify(animes);
 
   function createCard(item) {
     const card = document.createElement('div');
-    card.className = 'anime-card';
-    card.dataset.title = (item.name || '').toLowerCase();
+    card.tagName; // handled below
+    const anchor = document.createElement('a');
+    anchor.href = `/anime/${item.id}`;
+    anchor.className = 'anime-card';
+    anchor.dataset.title = (item.name || '').toLowerCase();
     const title = item.english_name || item.name || 'უსახელო';
     const studio = item.studios || '';
     const img = item.poster_url
       ? `<img src="${item.poster_url}" alt="${title} Cover" class="anime-poster" loading="lazy" />`
       : `<div class="no-poster">No Image</div>`;
-    card.innerHTML = `${img}<div class="anime-info"><div class="anime-title">${title}</div><div class="anime-meta">${studio}</div></div>`;
-    return card;
+    anchor.innerHTML = `${img}<div class="anime-info"><div class="anime-title">${title}</div><div class="anime-meta">${studio}</div></div>`;
+    return anchor;
   }
 
   function loadMore() {

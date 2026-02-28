@@ -25,7 +25,7 @@ try {
     <a href="/ongoing" class="panel-title-btn">მიმდინარე ანიმეები →</a>
     <div class="anime-grid-home" id="anime-grid">
       {animes.map((item) => (
-        <div class="anime-card" data-anime-id={item.id} data-title={(item.name || '').toLowerCase()}>
+        <a href={`/anime/${item.id}`} class="anime-card" data-anime-id={item.id} data-title={(item.name || '').toLowerCase()}>
           {item.poster_url
             ? <img src={item.poster_url} alt={`${item.name} Cover`} class="anime-poster" loading="lazy" />
             : <div class="no-poster">No Image</div>
@@ -34,7 +34,7 @@ try {
             <div class="anime-title">{item.english_name || item.name}</div>
             <div class="anime-meta">{item.studios || ''}</div>
           </div>
-        </div>
+        </a>
       ))}
     </div>
   </section>
