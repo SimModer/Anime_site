@@ -1,32 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-const query = `
-  query {
-    allOngoingAnimes {
-      id
-      name
-      english_name
-      studios
-      poster_url
-    }
-  }
-`;
+import { getAllOngoingAnimes } from '../lib/db';
 
 let animes = [];
 let fetchError = false;
 
 try {
-  const res = await fetch(`${Astro.url.origin}/api/graphql`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ query }),
-  });
-  const json = await res.json();
-  animes = json?.data?.allOngoingAnimes ?? [];
+  animes = await getAllOngoingAnimes();
 } catch (err) {
   fetchError = true;
-  console.error('GraphQL error:', err);
+  console.error('DB error:', err);
 }
 
 const animesJson = JSON.stringify(animes);
@@ -58,14 +41,12 @@ const animesJson = JSON.stringify(animes);
     font-weight: bold;
     margin-bottom: 20px;
   }
-
   .anime-grid-full {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     gap: 20px;
     padding-bottom: 20px;
   }
-
   .no-poster {
     width: 100%;
     height: 230px;
@@ -94,20 +75,12 @@ const animesJson = JSON.stringify(animes);
     const card = document.createElement('div');
     card.className = 'anime-card';
     card.dataset.title = (item.name || '').toLowerCase();
-
     const title = item.english_name || item.name || 'უსახელო';
     const studio = item.studios || '';
     const img = item.poster_url
       ? `<img src="${item.poster_url}" alt="${title} Cover" class="anime-poster" loading="lazy" />`
       : `<div class="no-poster">No Image</div>`;
-
-    card.innerHTML = `
-      ${img}
-      <div class="anime-info">
-        <div class="anime-title">${title}</div>
-        <div class="anime-meta">${studio}</div>
-      </div>
-    `;
+    card.innerHTML = `${img}<div class="anime-info"><div class="anime-title">${title}</div><div class="anime-meta">${studio}</div></div>`;
     return card;
   }
 
@@ -115,38 +88,31 @@ const animesJson = JSON.stringify(animes);
     if (isLoading || currentIndex >= ALL_ANIMES.length) return;
     isLoading = true;
     loadingMore.style.display = 'block';
-
     setTimeout(() => {
-      const batch = ALL_ANIMES.slice(currentIndex, currentIndex + BATCH_SIZE);
       const fragment = document.createDocumentFragment();
-      batch.forEach(item => fragment.appendChild(createCard(item)));
+      ALL_ANIMES.slice(currentIndex, currentIndex + BATCH_SIZE).forEach(item => fragment.appendChild(createCard(item)));
       grid.appendChild(fragment);
-      currentIndex += batch.length;
+      currentIndex += BATCH_SIZE;
       isLoading = false;
       loadingMore.style.display = 'none';
     }, 200);
   }
 
-  const observer = new IntersectionObserver((entries) => {
+  new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) loadMore();
-  }, { rootMargin: '200px' });
+  }, { rootMargin: '200px' }).observe(sentinel);
 
-  observer.observe(sentinel);
   loadMore();
 
   function debounce(fn, delay) {
     let timer;
-    return (...args) => {
-      clearTimeout(timer);
-      timer = setTimeout(() => fn(...args), delay);
-    };
+    return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), delay); };
   }
 
   searchInput?.addEventListener('input', debounce((e) => {
     const term = e.target.value.toLowerCase().trim();
     document.querySelectorAll('.anime-card').forEach(card => {
-      const title = card.dataset.title || '';
-      card.style.display = !term || title.includes(term) ? '' : 'none';
+      card.style.display = !term || (card.dataset.title || '').includes(term) ? '' : 'none';
     });
   }, 300));
 </script>
