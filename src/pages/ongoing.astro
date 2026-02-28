@@ -1,18 +1,34 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getAllOngoingAnimes } from '../lib/db';
+
+const query = `
+  query {
+    allOngoingAnimes {
+      id
+      name
+      english_name
+      studios
+      poster_url
+    }
+  }
+`;
 
 let animes = [];
 let fetchError = false;
 
 try {
-  animes = await getAllOngoingAnimes();
+  const res = await fetch(`${Astro.url.origin}/api/graphql`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  });
+  const json = await res.json();
+  animes = json?.data?.allOngoingAnimes ?? [];
 } catch (err) {
   fetchError = true;
-  console.error('DB error:', err);
+  console.error('GraphQL error:', err);
 }
 
-// Serialize all anime to JSON for client-side infinite scroll
 const animesJson = JSON.stringify(animes);
 ---
 
@@ -74,7 +90,6 @@ const animesJson = JSON.stringify(animes);
   const loadingMore = document.getElementById('loading-more');
   const searchInput = document.getElementById('search-input');
 
-  // Build a card element
   function createCard(item) {
     const card = document.createElement('div');
     card.className = 'anime-card';
@@ -96,13 +111,11 @@ const animesJson = JSON.stringify(animes);
     return card;
   }
 
-  // Render next batch of cards
   function loadMore() {
     if (isLoading || currentIndex >= ALL_ANIMES.length) return;
     isLoading = true;
     loadingMore.style.display = 'block';
 
-    // Small timeout so the loading indicator actually shows
     setTimeout(() => {
       const batch = ALL_ANIMES.slice(currentIndex, currentIndex + BATCH_SIZE);
       const fragment = document.createDocumentFragment();
@@ -110,21 +123,17 @@ const animesJson = JSON.stringify(animes);
       grid.appendChild(fragment);
       currentIndex += batch.length;
       isLoading = false;
-      loadingMore.style.display = currentIndex >= ALL_ANIMES.length ? 'none' : 'none';
+      loadingMore.style.display = 'none';
     }, 200);
   }
 
-  // Infinite scroll via IntersectionObserver
   const observer = new IntersectionObserver((entries) => {
     if (entries[0].isIntersecting) loadMore();
   }, { rootMargin: '200px' });
 
   observer.observe(sentinel);
-
-  // Load first batch immediately
   loadMore();
 
-  // Search filters already-rendered cards
   function debounce(fn, delay) {
     let timer;
     return (...args) => {

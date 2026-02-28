@@ -1,15 +1,32 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getOngoingAnimes } from '../lib/db';
+
+const query = `
+  query {
+    ongoingAnimes(limit: 8) {
+      id
+      name
+      english_name
+      studios
+      poster_url
+    }
+  }
+`;
 
 let animes = [];
 let fetchError = false;
 
 try {
-  animes = await getOngoingAnimes(8);
+  const res = await fetch(`${Astro.url.origin}/api/graphql`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ query }),
+  });
+  const json = await res.json();
+  animes = json?.data?.ongoingAnimes ?? [];
 } catch (err) {
   fetchError = true;
-  console.error('DB error:', err);
+  console.error('GraphQL error:', err);
 }
 ---
 
@@ -49,7 +66,7 @@ try {
   #ongoing-panel {
     background: transparent;
     border: none;
-    padding: 0;
+    width: 100%;
   }
 
   .anime-grid-home {
@@ -72,3 +89,23 @@ try {
     font-size: 12px;
   }
 </style>
+
+<script>
+  const searchInput = document.getElementById('search-input');
+
+  function debounce(fn, delay) {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), delay);
+    };
+  }
+
+  searchInput?.addEventListener('input', debounce((e) => {
+    const term = e.target.value.toLowerCase().trim();
+    document.querySelectorAll('.anime-card').forEach(card => {
+      const title = card.dataset.title || '';
+      card.style.display = !term || title.includes(term) ? '' : 'none';
+    });
+  }, 300));
+</script>
