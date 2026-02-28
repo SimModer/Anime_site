@@ -72,8 +72,6 @@ const animesJson = JSON.stringify(animes);
   const searchInput = document.getElementById('search-input');
 
   function createCard(item) {
-    const card = document.createElement('div');
-    card.tagName; // handled below
     const anchor = document.createElement('a');
     anchor.href = `/anime/${item.id}`;
     anchor.className = 'anime-card';

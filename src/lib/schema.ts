@@ -5,7 +5,7 @@ import { createSchema } from 'graphql-yoga';
 import {
   getOngoingAnimes,
   getAllOngoingAnimes,
-  getItemById,
+  getAnimeById,
   searchMedia,
 } from './db';
 

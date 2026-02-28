@@ -70,11 +70,7 @@ export async function getAllOngoingAnimes(): Promise<MediaItem[]> {
   return toObjects(result) as MediaItem[];
 }
 
-export async function getItemById(id: number): Promise<MediaItem | null> {
-  const db = await getDb();
-  const result = db.exec(`SELECT * FROM media WHERE id = ${id} LIMIT 1`);
-  return toObjects(result)[0] ?? null;
-}
+
 
 export async function searchMedia(term: string, limit = 30): Promise<MediaItem[]> {
   const db = await getDb();

@@ -1,5 +1,4 @@
 ---
-import Layout from '../../layouts/Layout.astro';
 import { getAnimeById } from '../../lib/db';
 
 const { id } = Astro.params;
@@ -118,7 +117,7 @@ const genres = anime?.genres ? anime.genres.split(',').map((g: string) => g.trim
                 </div>
               </div>
               <p class="description-text geo-text" id="desc-geo">
-                {anime.synopsis || <span class="empty-text">აღწერა არ არის.</span>}
+                {anime.synopsis ? anime.synopsis : <span class="empty-text">აღწერა არ არის.</span>}
               </p>
               <p class="description-text eng-text" id="desc-eng" style="display:none">
                 <span class="empty-text">No description available.</span>
@@ -160,8 +159,6 @@ const genres = anime?.genres ? anime.genres.split(',').map((g: string) => g.trim
 </html>
 
 <style is:global>
-  @import '../../../styles/global.css';
-
   :root {
     --primary:#4ecdc4; --primary-alt:#45b7d1; --accent:#ff6b6b;
     --bg-gradient:linear-gradient(135deg,#1a1a2e,#16213e);
