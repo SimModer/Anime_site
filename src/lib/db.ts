@@ -4,28 +4,42 @@ import { resolve } from 'node:path';
 import { createRequire } from 'node:module';
 import initSqlJs from 'sql.js';
 
+// ── Full schema from media table ──────────────────────────────
 export interface MediaItem {
   id: number;
   name: string;
-  english_name: string | null;
-  japanese_name: string | null;
-  other_name: string | null;
-  type: string;
-  status: string;
-  studios: string | null;
-  poster_url: string | null;
-  genres: string | null;
-  premiered: string | null;
-  episodes: number | null;
+  english_name:   string | null;
+  japanese_name:  string | null;
+  other_name:     string | null;
+  russian:        string | null;
+  type:           string;
+  episodes:       number | null;
+  episodes_aired: number | null;
+  volumes:        number | null;
+  chapters:       number | null;
+  aired:          string | null;
+  aired_on:       string | null;
+  released_on:    string | null;
+  premiered:      string | null;
+  producers:      string | null;
+  licensors:      string | null;
+  studios:        string | null;
+  source:         string | null;
+  duration:       string | null;
+  rating:         string | null;
+  genres:         string | null;
+  status:         string;
+  synopsis:       string | null;
+  poster_url:     string | null;
 }
 
+// ── Singleton DB instance ─────────────────────────────────────
 let _db: any = null;
 
 async function getDb() {
   if (_db) return _db;
 
   const require = createRequire(import.meta.url);
-  // Explicitly point sql.js to the wasm file so Vercel bundler can find it
   const wasmPath = require.resolve('sql.js/dist/sql-wasm.wasm');
   const wasmBinary = readFileSync(wasmPath);
 
@@ -43,11 +57,21 @@ function toObjects(result: any[]): any[] {
   );
 }
 
+// ── Queries ───────────────────────────────────────────────────
+
+export async function getAnimeById(id: number): Promise<MediaItem | null> {
+  const db = await getDb();
+  const result = db.exec(`SELECT * FROM media WHERE id = ${id} LIMIT 1`);
+  const items = toObjects(result);
+  return (items[0] as MediaItem) ?? null;
+}
+
 export async function getOngoingAnimes(limit = 8): Promise<MediaItem[]> {
   const db = await getDb();
   const result = db.exec(`
     SELECT id, name, english_name, japanese_name, other_name,
-           type, status, studios, poster_url, genres, premiered, episodes
+           type, status, studios, poster_url, genres, premiered,
+           episodes, episodes_aired, duration, rating, source
     FROM media
     WHERE type IN ('TV', 'MOVIE', 'OVA', 'ONA', 'SPECIAL', 'MUSIC')
       AND LOWER(status) = 'ongoing'
@@ -61,7 +85,8 @@ export async function getAllOngoingAnimes(): Promise<MediaItem[]> {
   const db = await getDb();
   const result = db.exec(`
     SELECT id, name, english_name, japanese_name, other_name,
-           type, status, studios, poster_url, genres, premiered, episodes
+           type, status, studios, poster_url, genres, premiered,
+           episodes, episodes_aired, duration, rating, source
     FROM media
     WHERE type IN ('TV', 'MOVIE', 'OVA', 'ONA', 'SPECIAL', 'MUSIC')
       AND LOWER(status) = 'ongoing'
@@ -70,23 +95,16 @@ export async function getAllOngoingAnimes(): Promise<MediaItem[]> {
   return toObjects(result) as MediaItem[];
 }
 
-
-
 export async function searchMedia(term: string, limit = 30): Promise<MediaItem[]> {
   const db = await getDb();
   const safe = term.replace(/'/g, "''");
   const result = db.exec(`
-    SELECT id, name, english_name, japanese_name, type, status, studios, poster_url, genres
+    SELECT id, name, english_name, japanese_name, type, status,
+           studios, poster_url, genres, episodes, duration, rating
     FROM media
-    WHERE name LIKE '%${safe}%' OR english_name LIKE '%${safe}%'
+    WHERE (name LIKE '%${safe}%' OR english_name LIKE '%${safe}%')
+      AND (genres IS NULL OR LOWER(genres) NOT LIKE '%hentai%')
     LIMIT ${limit}
   `);
   return toObjects(result) as MediaItem[];
-}
-
-export async function getAnimeById(id: number): Promise<any | null> {
-  const db = await getDb();
-  const result = db.exec(`SELECT * FROM media WHERE id = ${id} LIMIT 1`);
-  const items = toObjects(result);
-  return items[0] ?? null;
 }
