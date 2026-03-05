@@ -5,6 +5,8 @@ import time
 import os
 import math
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 # Шаблоны URL API для разных типов
 url_templates = {
     "animes": "https://shikimori.one/api/animes?order=popularity&page={}&limit=50",
@@ -33,8 +35,8 @@ url_template = url_templates[choice]
 file_prefix = choice  # чтобы разные данные сохранялись в разные файлы
 
 # Проверка существующего файла
-csv_file = f"{file_prefix}_data.csv"
-json_file = f"{file_prefix}_data.json"
+csv_file = os.path.join(script_dir, f"{file_prefix}_data.csv")
+json_file = os.path.join(script_dir, f"{file_prefix}_data.json")
 
 if os.path.exists(csv_file) and os.path.getsize(csv_file) > 0:
     existing_data = pd.read_csv(csv_file)
@@ -46,7 +48,7 @@ else:
     last_page = 1
 
 # Запрос кол-ва страниц
-i = int(input("Введите количество страниц (469 anime, 887 manga, 160 ranobe): "))
+i = int(input("Введите количество страниц (470 anime, 889 manga, 161 ranobe): "))
 
 for page in range(last_page, i + 1):
     url = url_template.format(page)
