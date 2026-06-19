@@ -48,7 +48,7 @@ else:
     last_page = 1
 
 # Запрос кол-ва страниц
-i = int(input("Введите количество страниц (473 anime, 890 manga, 157 ranobe): "))
+i = int(input("Введите количество страниц (474 anime, 895 manga, 157 ranobe): "))
 
 for page in range(last_page, i + 1):
     url = url_template.format(page)
